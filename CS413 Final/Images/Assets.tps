@@ -196,10 +196,11 @@
             <key type="filename">Buttons/How to Play Button.png</key>
             <key type="filename">Buttons/New Game Button Highlight.png</key>
             <key type="filename">Buttons/New Game Button.png</key>
-            <key type="filename">Game Screen.png</key>
             <key type="filename">Screens/Credits Screen.png</key>
+            <key type="filename">Screens/Game Screen.png</key>
             <key type="filename">Screens/Instructions Screen.png</key>
             <key type="filename">Screens/Introduction Screen.png</key>
+            <key type="filename">Sprites/Arrow Tower Button.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -218,7 +219,8 @@
             <filename>Screens/Credits Screen.png</filename>
             <filename>Screens/Instructions Screen.png</filename>
             <filename>Screens/Introduction Screen.png</filename>
-            <filename>Game Screen.png</filename>
+            <filename>Screens/Game Screen.png</filename>
+            <filename>Sprites/Arrow Tower Button.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

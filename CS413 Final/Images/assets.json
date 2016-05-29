@@ -1,8 +1,17 @@
 {"frames": {
 
-"New Game Button Highlight.png":
+"Arrow Tower Button.png":
 {
-	"frame": {"x":0,"y":0,"w":200,"h":100},
+	"frame": {"x":0,"y":0,"w":69,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":69,"h":69},
+	"sourceSize": {"w":69,"h":69},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"How to Play Button Highlight.png":
+{
+	"frame": {"x":69,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -11,7 +20,16 @@
 },
 "How to Play Button.png":
 {
-	"frame": {"x":200,"y":0,"w":200,"h":100},
+	"frame": {"x":269,"y":0,"w":200,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
+	"sourceSize": {"w":200,"h":100},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"New Game Button Highlight.png":
+{
+	"frame": {"x":469,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -20,16 +38,7 @@
 },
 "New Game Button.png":
 {
-	"frame": {"x":400,"y":0,"w":200,"h":100},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
-	"sourceSize": {"w":200,"h":100},
-	"pivot": {"x":0.5,"y":0.5}
-},
-"How to Play Button Highlight.png":
-{
-	"frame": {"x":600,"y":0,"w":200,"h":100},
+	"frame": {"x":669,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -38,7 +47,7 @@
 },
 "Back Button.png":
 {
-	"frame": {"x":800,"y":0,"w":200,"h":100},
+	"frame": {"x":869,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -47,7 +56,7 @@
 },
 "Credits Button Highlight.png":
 {
-	"frame": {"x":1000,"y":0,"w":200,"h":100},
+	"frame": {"x":1069,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -56,7 +65,7 @@
 },
 "Back Button Highlight.png":
 {
-	"frame": {"x":1200,"y":0,"w":200,"h":100},
+	"frame": {"x":1269,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -65,7 +74,7 @@
 },
 "Credits Button.png":
 {
-	"frame": {"x":1400,"y":0,"w":200,"h":100},
+	"frame": {"x":1469,"y":0,"w":200,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
@@ -113,8 +122,8 @@
 	"version": "1.0",
 	"image": "assets.png",
 	"format": "RGBA8888",
-	"size": {"w":1600,"h":1300},
+	"size": {"w":1669,"h":1300},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:34eda2dceef6a85b55c3b48a3aa9e1d4:8eb74983222e4a9e275e5290a7a5bd73:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:60db0138ba641c88891667d934cf5332:8b3d6c467add8d616e1a3a1b4e147b98:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
