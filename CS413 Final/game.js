@@ -195,7 +195,31 @@ function setup() {
 	/*******************************************************************************************************
 	Game Scene 
 	*******************************************************************************************************/
+	// Screen 
 	gameScreen = new Sprite(id["Game Screen.png"]);
+	
+	gameScene.addChild(gameScreen);
+	
+		// Tower's Button Container
+		var towerButtons = new Container();
+		
+		
+		// Information Container
+			/*
+			Contains information regarding:
+			1. Wave Number
+			2. Credits / Gold
+			*/
+			
+		// Tower Information Container
+			/*
+			Purpose is to provide information to the player on the following:
+			1. Name of the Tower
+			2. Tower level or upgrade level
+			3. Cost to upgrade
+			4. Damage
+			5. Attack Rate
+			*/
 	
 	
 	/*******************************************************************************************************
