@@ -54,7 +54,6 @@ Setup Function
 **********************************************************************************************************/
 
 function setup() {
-	
 	/*******************************************************************************************************
 	Sprite Creation Setup
 	*******************************************************************************************************/
@@ -197,11 +196,32 @@ function setup() {
 	*******************************************************************************************************/
 	// Screen 
 	gameScreen = new Sprite(id["Game Screen.png"]);
-	
 	gameScene.addChild(gameScreen);
 	
+		// Tower Button Sprites
+		arrowTowerBut = new Sprite(id["Arrow Tower Button.png"]);
+	
 		// Tower's Button Container
+			/*
+			Contains the buttons for the towers.
+			Buttons will be inactive until the player has enough money 
+			to purchase the tower.
+			*/
+			
 		var towerButtons = new Container();
+		towerButtons.position.x = 0;
+		towerButtons.position.y = 555;
+		gameScene.addChild(towerButtons);
+		
+			// Arrow Tower Button
+			towerButtons.addChild(arrowTowerBut);
+			arrowTowerBut.anchor.x = 0.5;
+			arrowTowerBut.anchor.y = 0.5;
+			arrowTowerBut.position.x = 50;
+			arrowTowerBut.position.y = 0;
+		
+			// More Towers to be added
+		
 		
 		
 		// Information Container
@@ -209,7 +229,13 @@ function setup() {
 			Contains information regarding:
 			1. Wave Number
 			2. Credits / Gold
+			Updated in game.
 			*/
+			
+		var userInterfaceInfo = new Container();
+		userInterfaceInfo.position.x = 700;
+		userInterfaceInfo.y = 555;
+		gameScene.addChild(userInterfaceInfo);
 			
 		// Tower Information Container
 			/*
@@ -219,7 +245,13 @@ function setup() {
 			3. Cost to upgrade
 			4. Damage
 			5. Attack Rate
+			Updated in game.
 			*/
+			
+		var towerInformation = new Container();
+		towerInformation.position.x = 500;
+		towerInformation.position.y = 555;
+		gameScene.addChild(towerInformation);
 	
 	
 	/*******************************************************************************************************
