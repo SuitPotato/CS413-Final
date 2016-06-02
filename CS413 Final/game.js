@@ -294,6 +294,7 @@ function game() {
 	if(addEnemyTimer < 1){
 		addEnemy();
 		addEnemyTimer = 100;
+		console.log(addedLife);
 	}
 	for(var i = 0, j = enemies.length; i < j; i++){
 		enemies[i].move();
@@ -306,6 +307,7 @@ function game() {
 	for(var i = 0, j = bullets.length; i < j; i++){
 		bullets[i].tween();
 		if(bullets[i].checkForHit()){
+			createjs.Tween.removeTweens(bullets[i]);
 			gameScreen.removeChild(bullets[i]);
 			bullets.splice(i,1);
 			j--;
