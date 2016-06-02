@@ -492,7 +492,28 @@ function changeTower(n) {
 
 // add a tower
 // On Mouse Down
+
+// Dimensions of Pathway
+/*
+1. Top Path 
+(0,40) Start - (760, 40)
+2. Connecting to Middle
+(720,80) Start - (40, 91)
+3. Middle Path
+(36, 171) Start - (724, 40)
+4. Connecting to Bottom
+(36, 211) Start - (40, 91)
+5. Bottom Path
+(36, 302) Start - (764, 40)
+
+*/
 function placeTower() {
+	var topPath = {x:0, y:0, width:760, height: 40};
+	var topToMiddle = {x:720, y:80, width:40, height:91};
+	var middlePath = {x:36, y:171, width:724, height:40};
+	var midToBot = {x:36, y: 211, width:40, height:91};
+	var bottomPath = {x:36, y:302, width:764, height:40};
+	
 	var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
 	towers.push(NewArrowTower);
 	//gameScreen.addChild(NewArrowTower);
