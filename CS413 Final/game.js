@@ -514,9 +514,10 @@ function placeTower() {
 	var midToBot = {x:36, y: 211, width:40, height:91};
 	var bottomPath = {x:36, y:302, width:764, height:40};
 	
+	
 	var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
 	towers.push(NewArrowTower);
-	//gameScreen.addChild(NewArrowTower);
+	
 	console.log("Placed the turret down.");
 	console.log("Towers: ");
 	console.log(towers);
@@ -650,4 +651,36 @@ function addEnemy() {
 	enemy = enemySetup(-100, 60);		// Change when I figure out spawning location
 	console.log("Created an Enemy.");
 	enemies.push(enemy);
+}
+
+function contain(sprite, container) {
+	
+	// Undef until collision, displays the collision location when a collision occurs
+	var collision = undefined;
+	
+	// Left Side
+	if (sprite.x < container.y){
+		sprite.x = container.x;
+		collision = 'left';
+	}
+	
+	// Top Side
+	if (sprite.y < container.y){
+		sprite.y = container.y;
+		collision = 'top';
+	}
+	
+	// Right Side
+	if (sprite.x + sprite.width > container.width){
+		sprite.x = container.width - sprite.width;
+		collision = 'right';
+	}
+	
+	// Bottom Side
+	if (sprite.y + sprite.height > container.height){
+		sprite.y = container.height - sprite.height;
+		collision = 'bottom';
+	}
+	
+	return collision
 }
