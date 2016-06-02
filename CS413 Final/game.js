@@ -303,8 +303,13 @@ function game() {
 		towers[i].findVector();
 		towers[i].fire();
 	}
-	for(var i = 0, j = towers.length; i < j; i++){
+	for(var i = 0, j = bullets.length; i < j; i++){
 		bullets[i].tween();
+		if(bullets[i].checkForHit()){
+			bullets.splice(i,1);
+			j--;
+			i--;
+		}
 	}
 	
 }
@@ -404,7 +409,7 @@ function arrowTowerSetup(x,y){
 	arrowTower.x = x;
 	arrowTower.y = y;
 	arrowTower.attackRate = 100;	
-	arrowTower.damage = 20;
+	arrowTower.damage = 1000;
 	arrowTower.cost = 50;
 	arrowTower.range = 150;
 	arrowTower.target = null;
@@ -521,43 +526,45 @@ function bulletSetup(x,y,target,damage) {
 	var bullet = new Sprite(id["Bullet Sprite.png"]);
 	bullet.x = x;
 	bullet.y = y;
+	bullet.anchor.x = 0.5;
+	bullet.anchor.y = 0.5;
 	bullet.target = target;
 	bullet.damage = damage;
-	bullet.xDistance = null;
-	bullet.yDistance = null;
+	bullet.xDistance = 0;
+	bullet.yDistance = 0;
 	bullet.dist = null;
-	console.log("Bullet X: ");
-	console.log(bullet.x);
-	console.log("Bullet Y: ");
-	console.log(bullet.y);
-	console.log("Bullet Target: ");
-	console.log(bullet.target);
-	console.log("Bullet Damage: ");
-	console.log(bullet.damage);
-	console.log("Towers: ");
-	console.log(towers);
-	
+	bullets.push(bullet);
 	gameScreen.addChild(bullet);
+	// bullet.tween();
 	
 	
 	// Intended effect is that the bullet goes for the center of the enemy,
 	// not the corners or edges.
 	bullet.move = function() {
-		var xDistance = bullet.target.x + bullet.width/2 - bullet.x;
-		var yDistance = bullet.target.y + bullet.height/2 - bullet.y;
-		var dist = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
-		bullet.x = bullet.x + bullet.speed*xDistance/dist;
-		bullet.y = bullet.y + bullet.speed*yDistance/dist;
+		bullet.xDistance = bullet.target.x + bullet.width/2 - bullet.x;
+		bullet.yDistance = bullet.target.y + bullet.height/2 - bullet.y;
+		// var dist = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
+		// bullet.x = bullet.x + bullet.speed*xDistance/dist;
+		// bullet.y = bullet.y + bullet.speed*yDistance/dist;
 	}
 	
 	// Tween to the target?
 	bullet.tween = function() {
-		bullet.move();
-		gameScreen.addChild(bullet);
-		bullets.push(bullet);
-		createjs.Tween.get(bullet)
-			.to({x:xDistance, y:yDistance}, 9000); 
+		bullet.move();	
+		console.log("xDistance: ");
+		console.log(bullet.xDistance);
+		console.log("yDistance: ");
+		console.log(bullet.yDistance);
+		createjs.Tween.get(bullet.position)
+			.to({x:bullet.xDistance, y:bullet.yDistance}, 1000); 
 		
+	}
+	
+	bullet.checkForHit = function() {
+		if(bullet.x < bullet.target.x + bullet.target.width && bullet.y < bullet.target.y + bullet.target.height){
+			bullet.target.life -= bullet.damage;
+			return true;
+		}
 	}
 	// Check for collision to do damage or just have a quick timer?
 	
@@ -601,7 +608,9 @@ function enemySetup(x,y) {
 function checkForDefeat() {
 	for(var i = 0, j = enemies.length; i < j; i++) {
 		if(enemies[i].life <= 0) {
+			console.log("Defeat!");
 			addedLife += 2; // Slowly increase maximum life
+			//removeTweens(enemies[i]);
 			// Increase money income
 			defeated += 1; 
 			enemies.splice(i,1);
@@ -613,7 +622,7 @@ function checkForDefeat() {
 
 function addEnemy() {
 	var enemy;						// Easy to add different types of enemies
-	enemy = enemySetup(300, 400);		// Change when I figure out spawning location
+	enemy = enemySetup(-100, 60);		// Change when I figure out spawning location
 	console.log("Created an Enemy.");
 	enemies.push(enemy);
 }
