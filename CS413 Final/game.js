@@ -49,7 +49,7 @@ var mousePosition = renderer.plugins.interaction.mouse.global;
 var enemies = [];
 var addedLife = 0; // Used to increment difficulty
 var defeated = 0;
-var addEnemyTimer = 6000;
+var addEnemyTimer = 100;
 
 
 
@@ -293,7 +293,7 @@ function game() {
 	addEnemyTimer--;
 	if(addEnemyTimer < 1){
 		addEnemy();
-		addEnemyTimer = 6000;
+		addEnemyTimer = 100;
 	}
 	for(var i = 0, j = enemies.length; i < j; i++){
 		enemies[i].move();
@@ -306,6 +306,7 @@ function game() {
 	for(var i = 0, j = bullets.length; i < j; i++){
 		bullets[i].tween();
 		if(bullets[i].checkForHit()){
+			gameScreen.removeChild(bullets[i]);
 			bullets.splice(i,1);
 			j--;
 			i--;
@@ -551,10 +552,10 @@ function bulletSetup(x,y,target,damage) {
 	// Tween to the target?
 	bullet.tween = function() {
 		bullet.move();	
-		console.log("xDistance: ");
-		console.log(bullet.xDistance);
-		console.log("yDistance: ");
-		console.log(bullet.yDistance);
+		//console.log("xDistance: ");
+		//console.log(bullet.xDistance);
+		//console.log("yDistance: ");
+		//console.log(bullet.yDistance);
 		createjs.Tween.get(bullet.position)
 			.to({x:bullet.xDistance, y:bullet.yDistance}, 1000); 
 		
@@ -612,7 +613,8 @@ function checkForDefeat() {
 			addedLife += 2; // Slowly increase maximum life
 			//removeTweens(enemies[i]);
 			// Increase money income
-			defeated += 1; 
+			defeated += 1;
+			gameScreen.removeChild(enemies[i]);
 			enemies.splice(i,1);
 			i--;	// Decrement
 			j--;	// Decrement
