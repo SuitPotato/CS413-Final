@@ -1,7 +1,6 @@
 /**********************************************************************************************************
 Game Global Constants
 **********************************************************************************************************/
-
 var GAME_WIDTH = 800;
 var GAME_HEIGHT = 600;
 
@@ -22,9 +21,7 @@ var Container = PIXI.Container,
 	TextureCache = PIXI.utils.TextureCache,
 	Texture = PIXI.Texture,
 	Sprite = PIXI.Sprite
-	Text = PIXI.Text;
-	
-	
+	Text = PIXI.Text;	
 /**********************************************************************************************************
 Creating the Stage and appending to Gameport
 **********************************************************************************************************/	
@@ -38,7 +35,6 @@ gameport.appendChild(renderer.view);
 /**********************************************************************************************************
 Loader
 **********************************************************************************************************/	
-
 loader
 	.add("images/assets.json")
 	.load(setup);
@@ -46,13 +42,20 @@ loader
 /**********************************************************************************************************
 Global Variables
 **********************************************************************************************************/
+var towers = [];
+var bullets = [];
+var money = 100; // Testing Purposes
+var mousePosition = renderer.plugins.interaction.mouse.global;
+var enemies = [];
+var addedLife = 0; // Used to increment difficulty
+var defeated = 0;
+var addEnemyTimer = 6000;
 
 
 
 /**********************************************************************************************************
 Setup Function
 **********************************************************************************************************/
-
 function setup() {
 	/*******************************************************************************************************
 	Sprite Creation Setup
@@ -197,6 +200,9 @@ function setup() {
 	// Screen 
 	gameScreen = new Sprite(id["Game Screen.png"]);
 	gameScene.addChild(gameScreen);
+	gameScreen.interactive = true;
+	//  gameScreen.on('mousedown', placeTower)
+	//gameScreen.on('mousemove', getMousePos);
 	
 		// Tower Button Sprites
 		arrowTowerBut = new Sprite(id["Arrow Tower Button.png"]);
@@ -219,7 +225,8 @@ function setup() {
 			arrowTowerBut.anchor.y = 0.5;
 			arrowTowerBut.position.x = 50;
 			arrowTowerBut.position.y = 0;
-		
+			arrowTowerBut.interactive = true;
+			arrowTowerBut.on('mousedown', arrowTowerButtonHandler);
 			// More Towers to be added
 		
 		
@@ -281,10 +288,29 @@ State Functions
 
 function introduction() {}
 
-function game() {}
+function game() {
+	checkForDefeat();
+	addEnemyTimer--;
+	if(addEnemyTimer < 1){
+		addEnemy();
+		addEnemyTimer = 6000;
+	}
+	for(var i = 0, j = enemies.length; i < j; i++){
+		enemies[i].move();
+	}
+	for(var i = 0, j = towers.length; i < j; i++){
+		towers[i].findTarget();
+		towers[i].findVector();
+		towers[i].fire();
+	}
+	for(var i = 0, j = towers.length; i < j; i++){
+		bullets[i].tween();
+	}
+	
+}
 
 /**********************************************************************************************************
-Handlers
+Menu Handlers
 **********************************************************************************************************/
 	
 	/*******************************************************************************************************
@@ -334,65 +360,260 @@ Handlers
 		creditScene.position.x = -800;
 		
 		createjs.Tween.get(introScene.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);
-		
 	}
+	/*
+	function getMousePos(mouseData){
+		console.log("X = "+mouseData.data.originalEvent.movementX);  
+		console.log("Y = "+mouseData.data.originalEvent.movementY);
+	}*/
+	
+/**********************************************************************************************************
+Game Handlers
+**********************************************************************************************************/
+function arrowTowerButtonHandler(){
+	if (money < 50){
+		gameScene.interactive = false;
+		console.log("Arrow Tower Handler: False")
+		selectedTower = null;
+		return null;
+	}
+	money -= 50;
+	gameScene.interactive = true;
+	// Subtract money when placed.
+	console.log("Total Money is: ");
+	console.log(money);
+	console.log("Arrow Tower Handler: True");
+	// Draw circle on mouse
+	// Allow player to place a tower
+	changeTower();
+}
+
 /**********************************************************************************************************
 Helper Functions
 **********************************************************************************************************/
-
-	/**********************************************************************************************************
-	Keyboard Function
-	**********************************************************************************************************/
 	
-	// Keyboard function to support general Ascii Key Codes function creation
-	function keyboard(keyCode) {
-		// Empty Key Object
-		var key = {};
-		// Code:keyCode
-		key.code = keyCode;
-		
-		// Default Settings for button positions
-		key.isDown = false;
-		key.isUp = true;
-		key.press = undefined;
-		key.release = undefined;
-	  
-		// When the key is pressed, call the downHandler
-		key.downHandler = function(event) {
-			// Verify the keyCode parameter matches the object code
-			if (event.keyCode === key.code) {
-				// If the key is up then key press
-				if (key.isUp && key.press) key.press();
-				
-				// Settings for button positions
-				key.isDown = true;
-				key.isUp = false;
-			}
-			// Cancels the event
-			event.preventDefault();
-		};
+/*******************************************************************************************************
+Tower Stuff
+*******************************************************************************************************/
 
-		//The is released, call the upHandler
-		key.upHandler = function(event) {
-			// Verify the keyCode parameter matches the object code
-			if (event.keyCode === key.code) {
-				// If the key is down and released then release
-				if (key.isDown && key.release) key.release();
-				
-				// Setting for button positions
-				key.isDown = false;
-				key.isUp = true;
-			}
-		// Cancels the event
-		event.preventDefault();
-		};
 
-	  //Attach event listeners
-	  window.addEventListener(
-		"keydown", key.downHandler.bind(key), false
-	  );
-	  window.addEventListener(
-		"keyup", key.upHandler.bind(key), false
-	  );
-	  return key;
+function arrowTowerSetup(x,y){
+	var arrowTower = new Sprite(id["Arrow Tower.png"]);
+	arrowTower.anchor.x = 0.5;
+	arrowTower.anchor.y = 0.5;
+	arrowTower.x = x;
+	arrowTower.y = y;
+	arrowTower.attackRate = 100;	
+	arrowTower.damage = 20;
+	arrowTower.cost = 50;
+	arrowTower.range = 150;
+	arrowTower.target = null;
+	gameScreen.addChild(arrowTower);
+	
+	console.log("Arrow Tower Properites: ");
+	console.log(arrowTower);
+	console.log(arrowTower.x);
+	console.log(arrowTower.y);
+	console.log(arrowTower.findTarget);
+
+	
+// Lets the arrow tower find a target
+arrowTower.findTarget = function() {
+	// If there are no enemies, then there is no target
+	if(enemies.length === 0) {
+		arrowTower.target = null;
+		return;
 	}
+	
+	// If the target is defeated, then remove target
+	if(arrowTower.target && arrowTower.target.ife <= 0) {
+		arrowTower.target = null;
+	}
+	
+	// Find the first enemy within the range and target
+	for(var i = 0, j = enemies.length; i < j; i++){
+		// 60 is added to look at the center of the square.
+		var dist = (enemies[i].x-arrowTower.x)*(enemies[i].x-arrowTower.x+60)+
+			(enemies[i].y-arrowTower.y)*(enemies[i].y-arrowTower.y+60);
+		if(dist < (arrowTower.range * arrowTower.range)) {
+			arrowTower.target = enemies[i];
+			return;
+		}
+	}
+}
+
+// Lets the Arrow Tower Fire
+arrowTower.fire = function() {
+	arrowTower.attackRate--;
+	if(arrowTower.target && arrowTower.attackRate <= 0) {
+		bullets.push(bulletSetup(arrowTower.x, arrowTower.y, arrowTower.target, arrowTower.damage));
+		arrowTower.attackRate = 100;
+		console.log("FIRE!")
+		// Reset attack rate
+	}
+}
+
+	
+// Need to find Vector for bullets
+arrowTower.findVector = function() {
+	// If there is no target, then return false
+	if (this.target == null)
+		return false;
+	var xDistance = arrowTower.target.x - arrowTower.x;
+	var yDistance = arrowTower.target.y - arrowTower.y;
+	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
+	arrowTower.xFire = arrowTower.x + 60 * xDistance / dist;
+	arrowTower.yFire = arrowTower.y + 60 * yDistance / dist;
+}
+
+return arrowTower;
+}
+
+/*******************************************************************************************************
+Tower Placing
+*******************************************************************************************************/
+// Change Tower Type
+function changeTower(n) {
+	currentTower = n;
+	console.log("Mouse Position");
+	console.log(mousePosition);
+	console.log("Change Tower");
+	gameScreen.interactive = true;
+	gameScreen.on('mousedown', placeTower);
+}
+
+// add a tower
+// On Mouse Down
+function placeTower() {
+	var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
+	towers.push(NewArrowTower);
+	//gameScreen.addChild(NewArrowTower);
+	console.log("Placed the turret down.");
+	console.log("Towers: ");
+	console.log(towers);
+	addEnemy();
+	gameScreen.interactive = false;
+
+}
+
+function towerAllowed(x,y){
+	
+	// Contain in map and not in the path 
+	// Make sure it isn't to close to any other towers	
+}
+
+function drawMouse(){
+	// If the mouse isn't on the game screen 
+	if(!mouse)
+		return;
+	var graphics = new PIXI.Graphics();
+	var range = towerClasses[currentTower].range;
+	// if tower is allowed, transparent yellow
+	// else tower is not allowed, transparent red
+}
+
+/*******************************************************************************************************
+Bullets
+*******************************************************************************************************/
+// Need to create a bullet that goes to the intended target
+// and deal damage.
+function bulletSetup(x,y,target,damage) {
+	var bullet = new Sprite(id["Bullet Sprite.png"]);
+	bullet.x = x;
+	bullet.y = y;
+	bullet.target = target;
+	bullet.damage = damage;
+	bullet.xDistance = null;
+	bullet.yDistance = null;
+	bullet.dist = null;
+	console.log("Bullet X: ");
+	console.log(bullet.x);
+	console.log("Bullet Y: ");
+	console.log(bullet.y);
+	console.log("Bullet Target: ");
+	console.log(bullet.target);
+	console.log("Bullet Damage: ");
+	console.log(bullet.damage);
+	console.log("Towers: ");
+	console.log(towers);
+	
+	gameScreen.addChild(bullet);
+	
+	
+	// Intended effect is that the bullet goes for the center of the enemy,
+	// not the corners or edges.
+	bullet.move = function() {
+		var xDistance = bullet.target.x + bullet.width/2 - bullet.x;
+		var yDistance = bullet.target.y + bullet.height/2 - bullet.y;
+		var dist = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
+		bullet.x = bullet.x + bullet.speed*xDistance/dist;
+		bullet.y = bullet.y + bullet.speed*yDistance/dist;
+	}
+	
+	// Tween to the target?
+	bullet.tween = function() {
+		bullet.move();
+		gameScreen.addChild(bullet);
+		bullets.push(bullet);
+		createjs.Tween.get(bullet)
+			.to({x:xDistance, y:yDistance}, 9000); 
+		
+	}
+	// Check for collision to do damage or just have a quick timer?
+	
+	return bullet;
+}
+
+/*******************************************************************************************************
+Attackers
+*******************************************************************************************************/
+function enemySetup(x,y) {
+	enemy = new Sprite (id["Generic Enemy.png"]);
+	enemy.x = x;
+	enemy.y = y;
+	enemy.vx = 0;
+	enemy.vy = 0;
+	enemy.anchor.x = 0.5;
+	enemy.anchor.y = 0.5;
+	enemy.speed = 10;
+	enemy.life = 40 + addedLife;
+	
+	enemy.move = function() {
+		// Contain within the enemy walk path
+		var move = enemy.speed;
+		// (-100,60) - (740,60)
+		// (740,60) - (740,194)
+		// (740,194) - (54, 194)
+		// (54,194) - (54, 324)
+		// (54,324) - (900,324) - Go a bit beyond 
+		
+		createjs.Tween.get(enemy)
+			.to({x:740}, 5000)
+			.to({y:194}, 5000)
+			.to({x:54}, 5000)
+			.to({y:324}, 5000)
+			.to({x:900}, 5000);
+	}
+	gameScreen.addChild(enemy);
+	return enemy;
+}
+
+function checkForDefeat() {
+	for(var i = 0, j = enemies.length; i < j; i++) {
+		if(enemies[i].life <= 0) {
+			addedLife += 2; // Slowly increase maximum life
+			// Increase money income
+			defeated += 1; 
+			enemies.splice(i,1);
+			i--;	// Decrement
+			j--;	// Decrement
+		}
+	}
+}
+
+function addEnemy() {
+	var enemy;						// Easy to add different types of enemies
+	enemy = enemySetup(300, 400);		// Change when I figure out spawning location
+	console.log("Created an Enemy.");
+	enemies.push(enemy);
+}
