@@ -105,12 +105,12 @@ function setup() {
 	selectSound = PIXI.audioManager.getAudio("audio/Select.mp3");
 	smallTowerSound = PIXI.audioManager.getAudio("audio/Small Tower.mp3");
 	
-	arrowTowerSound.volume = 0.3;
-	defeatSound.volume = 0.4;
-	lifeLostSound.volume = 0.6;
-	longTowerSound.volume = 0.3;
-	quickTowerSound.volume = 0.3;
-	smallTowerSound.volume = 0.3;
+	arrowTowerSound.volume = 0.1;
+	defeatSound.volume = 0.2;
+	lifeLostSound.volume = 0.4;
+	longTowerSound.volume = 0.1;
+	quickTowerSound.volume = 0.1;
+	smallTowerSound.volume = 0.1;
 	/*******************************************************************************************************
 	Scene Creations
 	*******************************************************************************************************/
