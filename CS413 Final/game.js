@@ -52,9 +52,12 @@ var defeated = 0;
 var addEnemyTimer = 100;
 
 
-
-
-
+// Text Variables
+			var waveNumberText = new Text('wave test');
+			var moneyText = new Text(money);
+			var livesText = new Text('lives');
+			
+		
 /**********************************************************************************************************
 Setup Function
 **********************************************************************************************************/
@@ -287,9 +290,26 @@ function setup() {
 			*/
 			
 		var userInterfaceInfo = new Container();
-		userInterfaceInfo.position.x = 100;
-		userInterfaceInfo.y = 555;
+		userInterfaceInfo.position.x = 555;
+		userInterfaceInfo.y = 0;
 		gameInterface.addChild(userInterfaceInfo);
+				
+			// Wave Number Text
+			userInterfaceInfo.addChild(waveNumberText);
+			waveNumberText.position.x = 0;
+			waveNumberText.position.y = 0;
+			
+			// Money Text
+			userInterfaceInfo.addChild(moneyText);
+			moneyText.position.x = 0;
+			moneyText.position.y = 20;
+			
+			// Lives Text
+			userInterfaceInfo.addChild(livesText);
+			livesText.position.x = 0;
+			livesText.position.y = 40;
+			
+			
 			
 		// Tower Information Container
 			/*
@@ -303,9 +323,11 @@ function setup() {
 			*/
 			
 		var towerInformation = new Container();
-		towerInformation.position.x = 100;
-		towerInformation.position.y = 555;
+		towerInformation.position.x = 0;
+		towerInformation.position.y = 455;
 		gameInterface.addChild(towerInformation);
+		
+		
 	
 	
 	/*******************************************************************************************************
@@ -338,6 +360,7 @@ function introduction() {}
 function game() {
 	checkForDefeat();
 	addEnemyTimer--;
+	moneyText.text = money;
 	
 	/*
 	NOTE TO SELF:
@@ -453,6 +476,7 @@ function arrowTowerButtonHandler(){
 		return null;
 	}
 	money -= 50;
+	
 	grass.interactive = true;
 	selectedTower = "Arrow Tower";
 	changeTower(selectedTower);
@@ -710,27 +734,10 @@ function changeTower(n) {
 	grass.on('mousedown', placeTower);
 }
 
-// add a tower
-// On Mouse Down
 
-// Dimensions of Pathway
-/*
-1. Top Path 
-(0,40) Start - (760, 40)
-2. Connecting to Middle
-(720,80) Start - (40, 91)
-3. Middle Path
-(36, 171) Start - (724, 40)
-4. Connecting to Bottom
-(36, 211) Start - (40, 91)
-5. Bottom Path
-(36, 302) Start - (764, 40)
-
-*/
 function placeTower() {
 	if(selectedTower == "Arrow Tower"){
 		var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
-		
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewArrowTower) == true){
 			// console.log("Created.");
 			towers.push(NewArrowTower);
@@ -739,7 +746,6 @@ function placeTower() {
 			grass.removeChild(NewArrowTower);
 		}
 	}
-	
 	else if(selectedTower == "Quick Tower"){
 		var NewQuickTower = quickTowerSetup(mousePosition.x,mousePosition.y);
 		
@@ -751,7 +757,6 @@ function placeTower() {
 			grass.removeChild(NewQuickTower);
 		}
 	}
-	
 	else if(selectedTower == "Long Tower"){
 		var NewLongTower = longTowerSetup(mousePosition.x,mousePosition.y);
 		
@@ -763,14 +768,11 @@ function placeTower() {
 			grass.removeChild(NewLongTower);
 		}
 	}
-	
 	else {
 		console.log("Whoops. Tower Error.")
 	}
-	
 	selectedTower == "Null";
 	grass.interactive = false;
-
 }
 
 /*
@@ -787,9 +789,6 @@ Grass Contain: Check
 
 (0,0) - (800,446) - Game
 */
-
-
-
 function towerAllowed(x,y, tower){
 	var checkGame = new PIXI.Rectangle(0,0,800,446);
 	
