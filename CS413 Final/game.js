@@ -743,19 +743,24 @@ function placeTower() {
 	else if(selectedTower == "Quick Tower"){
 		var NewQuickTower = quickTowerSetup(mousePosition.x,mousePosition.y);
 		
-		if (towerAllowed(mousePosition.x, mousePosition.y, NewArrowTower) == true){
+		if (towerAllowed(mousePosition.x, mousePosition.y, NewQuickTower) == true){
 			// console.log("Created.");
-			towers.push(NewArrowTower);
+			towers.push(NewQuickTower);
 		}
 		else{
-			grass.removeChild(NewArrowTower);
+			grass.removeChild(NewQuickTower);
 		}
 	}
 	
 	else if(selectedTower == "Long Tower"){
-		if (towerAllowed(mousePosition.x, mousePosition.y)== true){
-			var NewLongTower = longTowerSetup(mousePosition.x,mousePosition.y);
+		var NewLongTower = longTowerSetup(mousePosition.x,mousePosition.y);
+		
+		if (towerAllowed(mousePosition.x, mousePosition.y, NewLongTower) == true){
+			// console.log("Created.");
 			towers.push(NewLongTower);
+		}
+		else{
+			grass.removeChild(NewLongTower);
 		}
 	}
 	
@@ -770,12 +775,15 @@ function placeTower() {
 
 /*
 Grass Contain: Check
-(0,0)-(800,40) 1 
-(760,40)-(40,262) 2
-(0,80)-(720,91) 3 
-(0,171)-(36,275) 4
-(76,211)-(684,91) 5
-(36,342)-(764,104) 6
+(0,0)-(759,40) 1 - Bottom
+(759,0)-(41,211) 2 - Left Corner
+(759,211)-(41,91) 3 - Left
+(0,80)-(36,91) 4 - Top, Right Corner
+(36,80)-(720,91) 5 - Top, Bottom, Right
+(0,171)-(36,171) 6 - Right
+(76,211)-(683,91) 7 - Top, Left, Bottom
+(0,342)-(36,104) 8 - Top Right
+(36,342)-(764, 104) 9 - Top
 
 (0,0) - (800,446) - Game
 */
@@ -784,39 +792,51 @@ Grass Contain: Check
 
 function towerAllowed(x,y, tower){
 	var checkGame = new PIXI.Rectangle(0,0,800,446);
-	var checkOne = new PIXI.Rectangle(0,0,800,40);
-	var checkTwo = new PIXI.Rectangle(760,40,40,262);
-	var checkThree = new PIXI.Rectangle(0,80,720,91);
-	var checkFour = new PIXI.Rectangle(0,171,36,275);
-	var checkFive = new PIXI.Rectangle(76,211,684,91);
-	var checkSix = new PIXI.Rectangle(36,342,764,104);
 	
+	var checkOne = new PIXI.Rectangle(0,0,759,40);
+	var checkTwo = new PIXI.Rectangle(759,0,41,211);
+	var checkThree = new PIXI.Rectangle(759,211,41,91);
+	var checkFour = new PIXI.Rectangle(0,80,36,91);
+	var checkFive = new PIXI.Rectangle(36,80,720,91);
+	var checkSix = new PIXI.Rectangle(0,171,36,171);
+	var checkSeven = new PIXI.Rectangle(76,211,683,91);
+	var checkEight = new PIXI.Rectangle(0,342,36,104);
+	var checkNine = new PIXI.Rectangle(36,342,764,104);
+	console.log(x);
+	console.log(y);
 
+	var width = tower.width/2;
+	var height = tower.height/2;
 	
 	// Checks Mouse Click, not entire tower, so I'm checking tower edges
 	// Could be more specific, but I want to have the tower's dimensions be 
 	// flexible so I can change it later if I want.
 	if(checkGame.contains(x,y) == true){
+		
 		console.log("checkGame");
 				
 		// Left
-		if(checkGame.contains((x - tower.width) ,y) == false){
+		if(checkGame.contains((x - width) ,y) == false){
+			
 			console.log("Left");
 			return false;
 		}
 		// Right
-		if(checkGame.contains(x + tower.width, y) == false){
-			console.log("RIght");
-			return false;
-		}
-		// Top
-		if(checkGame.contains(x, y + tower.height) == false) {
-			console.log("Top");
+		if(checkGame.contains((x + width), y) == false){
+			console.log("Right");
 			return false;
 		}
 		// Bottom
-		if(checkGame.contains(x, y - tower.height) == false){
-			console.log("Bot");
+		if(checkGame.contains(x, (y + height)) == false) {
+			console.log("Bottom");
+			console.log(x);
+			console.log(y);
+			console.log(y + height);
+			return false;
+		}
+		// Top
+		if(checkGame.contains(x, (y - height)) == false){
+			console.log("Top");
 			return false;
 		}
 		
@@ -828,133 +848,135 @@ function towerAllowed(x,y, tower){
 		}
 		
 	}
+	// checkOne
 	if (checkOne.contains(x,y) == true){
 		console.log("checkOne");
-		// Left
-		if(checkOne.contains(x + tower.width ,y) == false){
-			return false;
-		}
-		// Right
-		if(checkOne.contains(x, y + tower.height) == false){
-			return false;
-		}
-		// Top
-		if(checkOne.contains(x + tower.width, y + tower.height) == false) {
-			return false;
-		}
 		// Bottom
-		if(checkOne.contains(x - tower.width, y - tower.height) == false){
+		if(checkOne.contains(x, y + height) == false) {
+			console.log("Bottom");
 			return false;
 		}
-		
+		// Towers
 		for(var i = 0, j = towers.length; i<j; i++){
 			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
 				return false;
 			}
 		}
-		
 		return true;
 	}
+	// checkTwo
 	if (checkTwo.contains(x,y) == true){
 		console.log("checkTwo");
-		// Left
-		if(checkTwo.contains(x + tower.width ,y) == false){
+		// Left Corner
+		if(checkTwo.contains(x - width ,y + height) == false){
+			console.log("Left Corner");
 			return false;
 		}
-		// Right
-		if(checkTwo.contains(x, y + tower.height) == false){
-			return false;
-		}
-		// Top
-		if(checkTwo.contains(x + tower.width, y + tower.height) == false) {
-			return false;
-		}
-		// Bottom
-		if(checkTwo.contains(x - tower.width, y - tower.height) == false){
-			return false;
-		}
-		
+		// Towers
 		for(var i = 0, j = towers.length; i<j; i++){
 			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
 				return false;
 			}
 		}
-		
 		return true;
 	}
+	// checkThree
 	if (checkThree.contains(x,y) == true){
 		console.log("checkThree");
 		// Left
-		if(checkThree.contains(x + tower.width ,y) == false){
+		if(checkThree.contains(x - width ,y) == false){
+			console.log("Left");
 			return false;
 		}
-		// Right
-		if(checkThree.contains(x, y + tower.height) == false){
-			return false;
-		}
-		// Top
-		if(checkThree.contains(x + tower.width, y + tower.height) == false) {
-			return false;
-		}
-		// Bottom
-		if(checkThree.contains(x - tower.width, y - tower.height) == false){
-			return false;
-		}
-		
+		// Towers
 		for(var i = 0, j = towers.length; i<j; i++){
 			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
 				return false;
 			}
 		}
-		
 		return true;
 	}
+	// checkFour
 	if (checkFour.contains(x,y) == true){
 		console.log("checkFour");
-		// Left
-		if(checkFour.contains(x + tower.width ,y) == false){
-			return false;
-		}
-		// Right
-		if(checkFour.contains(x, y + tower.height) == false){
+		// Right Corner
+		if(checkFour.contains(x + width, y - width) == false){
+			console.log("Right Corner");
 			return false;
 		}
 		// Top
-		if(checkFour.contains(x + tower.width, y + tower.height) == false) {
+		if(checkFour.contains(x, y - height) == false){
 			return false;
 		}
-		// Bottom
-		if(checkFour.contains(x - tower.width, y - tower.height) == false){
-			return false;
-		}
-		
+		// Towers
 		for(var i = 0, j = towers.length; i<j; i++){
 			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
 				return false;
 			}
 		}
-		
 		return true;
 	}
+	// checkFive
 	if (checkFive.contains(x,y) == true){
 		console.log("checkFive");
-		// Left
-		if(checkFive.contains(x + tower.width ,y) == false){
-			return false;
-		}
 		// Right
-		if(checkFive.contains(x, y + tower.height) == false){
-			return false;
-		}
-		// Top
-		if(checkFive.contains(x + tower.width, y + tower.height) == false) {
+		if(checkFive.contains(x + width, y) == false){
+			console.log("Right");
 			return false;
 		}
 		// Bottom
-		if(checkFive.contains(x - tower.width, y - tower.height) == false){
+		if(checkFive.contains(x , y + height) == false) {
+			console.log("Bottom");
 			return false;
 		}
-		
+		// Top
+		if(checkFive.contains(x, y - height) == false){
+			console.log("Top");
+			return false;
+		}
+		// Towers
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		return true;
+	}
+	// checkSix
+	if (checkSix.contains(x,y) == true){
+		console.log("checkSix");
+		// Right
+		if(checkSix.contains(x + width, y) == false){
+			console.log("Right");
+			return false;
+		}
+		// Towers
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		return true;
+	}
+	// checkSeven
+	if (checkSeven.contains(x,y) == true){
+		console.log("checkSeven");
+		// Left
+		if(checkSeven.contains(x - width ,y) == false){
+			console.log("Left");
+			return false;
+		}
+		// Bottom
+		if(checkSeven.contains(x , y + height) == false) {
+			console.log("Bottom");
+			return false;
+		}
+		// Top
+		if(checkSeven.contains(x, y - height) == false){
+			console.log("Top");
+			return false;
+		}
+		// Towers
 		for(var i = 0, j = towers.length; i<j; i++){
 			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
 				return false;
@@ -963,31 +985,36 @@ function towerAllowed(x,y, tower){
 		
 		return true;
 	}
-	if (checkSix.contains(x,y) == true){
-		console.log("checkSix");
-		// Left
-		if(checkSix.contains(x + tower.width ,y) == false){
+	// checkEight
+	if(checkEight.contains(x,y) == true){
+		console.log("checkEight");
+		// Top Right
+		if(checkEight.contains(x + height, y - height) == false){
+			console.log("Top Right");
 			return false;
 		}
-		// Right
-		if(checkSix.contains(x, y + tower.height) == false){
-			return false;
-		}
-		// Top
-		if(checkSix.contains(x + tower.width, y + tower.height) == false) {
-			return false;
-		}
-		// Bottom
-		if(checkSix.contains(x - tower.width, y - tower.height) == false){
-			return false;
-		}
-		
+		// Towers
 		for(var i = 0, j = towers.length; i<j; i++){
 			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
 				return false;
 			}
 		}
-		
+		return true;
+	}
+	// checkNine
+	if (checkNine.contains(x,y) == true){
+		console.log("checkNine");
+		// Top
+		if(checkNine.contains(x, y - height) == false){
+			console.log("Top");
+			return false;
+		}
+		// Towers
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
 		return true;
 	}
 	// Default
