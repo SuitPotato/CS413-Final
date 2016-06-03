@@ -50,12 +50,14 @@ var enemies = [];
 var addedLife = 0; // Used to increment difficulty
 var defeated = 0;
 var addEnemyTimer = 100;
+var selectedTower;
 
 
 // Text Variables
 			var waveNumberText = new Text('wave test');
 			var moneyText = new Text(money);
 			var livesText = new Text('lives');
+			var towerInformationText = new Text('Tower Test');
 			
 		
 /**********************************************************************************************************
@@ -290,9 +292,9 @@ function setup() {
 			*/
 			
 		var userInterfaceInfo = new Container();
-		userInterfaceInfo.position.x = 555;
-		userInterfaceInfo.y = 0;
 		gameInterface.addChild(userInterfaceInfo);
+		userInterfaceInfo.position.x = 655;
+		userInterfaceInfo.position.y = 0;
 				
 			// Wave Number Text
 			userInterfaceInfo.addChild(waveNumberText);
@@ -315,18 +317,19 @@ function setup() {
 			/*
 			Purpose is to provide information to the player on the following:
 			1. Name of the Tower
-			2. Tower level or upgrade level
-			3. Cost to upgrade
 			4. Damage
 			5. Attack Rate
 			Updated in game.
 			*/
 			
 		var towerInformation = new Container();
-		towerInformation.position.x = 0;
-		towerInformation.position.y = 455;
+		towerInformation.position.x = 455;
+		towerInformation.position.y = 0;
 		gameInterface.addChild(towerInformation);
 		
+			towerInformation.addChild(towerInformationText);
+			towerInformationText.position.x = 0;
+			towerInformationText.position.y = 0;
 		
 	
 	
@@ -361,6 +364,22 @@ function game() {
 	checkForDefeat();
 	addEnemyTimer--;
 	moneyText.text = money;
+	
+	if(selectedTower == null){
+		towerInformationText.text = (' ');
+	}
+	else if(selectedTower == "Arrow Tower"){
+		towerInformationText.text = ('Arrow Tower \n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+	}
+	else if(selectedTower == "Quick Tower"){
+		towerInformationText.text = ('Quick Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+	}
+	else if(selectedTower == "Long Tower"){
+		towerInformationText.text = ('Long Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+	}
+	else{
+		towerInformationText.text = (' ');
+	}
 	
 	/*
 	NOTE TO SELF:
@@ -471,7 +490,6 @@ Game Handlers
 function arrowTowerButtonHandler(){
 	if (money < 50){
 		grass.interactive = false;
-		//console.log("Arrow Tower Handler: False")
 		selectedTower = null;
 		return null;
 	}
@@ -736,6 +754,7 @@ function changeTower(n) {
 
 
 function placeTower() {
+	
 	if(selectedTower == "Arrow Tower"){
 		var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewArrowTower) == true){
@@ -771,7 +790,7 @@ function placeTower() {
 	else {
 		console.log("Whoops. Tower Error.")
 	}
-	selectedTower == "Null";
+	selectedTower = null;
 	grass.interactive = false;
 }
 
@@ -1112,7 +1131,7 @@ function checkForDefeat() {
 			//console.log("Defeat!");
 			addedLife += 2; // Slowly increase maximum life
 			//removeTweens(enemies[i]);
-			// Increase money income
+			money += 5;
 			defeated += 1;
 			gameScene.removeChild(enemies[i]);
 			enemies.splice(i,1);
