@@ -535,6 +535,8 @@ function longTowerSetup(x,y){
 	var longTower = new Sprite(id["Long Tower.png"]);
 	longTower.anchor.x = 0.5;
 	longTower.anchor.y = 0.5;
+	longTower.scale = 0.7;
+	longTower.scale = 0.7;
 	longTower.x = x;
 	longTower.y = y;
 	longTower.attackRate = 125;	
@@ -601,6 +603,8 @@ function quickTowerSetup(x,y){
 	var quickTower = new Sprite(id["Quick Tower.png"]);
 	quickTower.anchor.x = 0.5;
 	quickTower.anchor.y = 0.5;
+	quickTower.scale.x = 0.7;
+	quickTower.scale.y = 0.7;
 	quickTower.x = x;
 	quickTower.y = y;
 	quickTower.attackRate = 50;	
@@ -674,6 +678,8 @@ function arrowTowerSetup(x,y){
 	var arrowTower = new Sprite(id["Arrow Tower.png"]);
 	arrowTower.anchor.x = 0.5;
 	arrowTower.anchor.y = 0.5;
+	arrowTower.scale.x = 0.7;
+	arrowTower.scale.y = 0.7;
 	arrowTower.x = x;
 	arrowTower.y = y;
 	arrowTower.attackRate = 100;	
@@ -765,7 +771,7 @@ function placeTower() {
 			grass.removeChild(NewArrowTower);
 		}
 	}
-	else if(selectedTower == "Quick Tower"){
+	if(selectedTower == "Quick Tower"){
 		var NewQuickTower = quickTowerSetup(mousePosition.x,mousePosition.y);
 		
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewQuickTower) == true){
@@ -776,7 +782,7 @@ function placeTower() {
 			grass.removeChild(NewQuickTower);
 		}
 	}
-	else if(selectedTower == "Long Tower"){
+	if(selectedTower == "Long Tower"){
 		var NewLongTower = longTowerSetup(mousePosition.x,mousePosition.y);
 		
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewLongTower) == true){
@@ -786,9 +792,6 @@ function placeTower() {
 		else{
 			grass.removeChild(NewLongTower);
 		}
-	}
-	else {
-		console.log("Whoops. Tower Error.")
 	}
 	selectedTower = null;
 	grass.interactive = false;
@@ -1100,7 +1103,9 @@ function bulletSetup(x,y,target,damage) {
 /*******************************************************************************************************
 Attackers
 *******************************************************************************************************/
-function enemySetup(x,y) {
+// Generic Enemy
+// Not slow or fast and has average amount of health.
+function genericMookSetup(x,y) {
 	enemy = new Sprite (id["Generic Enemy.png"]);
 	// Starting Location
 	enemy.x = x;
@@ -1109,7 +1114,6 @@ function enemySetup(x,y) {
 	enemy.anchor.y = 0.5;
 	enemy.speed = 10;
 	enemy.life = 40 + addedLife;
-	
 	
 	enemy.move = function() {
 		// Contain within the enemy walk path
@@ -1125,14 +1129,66 @@ function enemySetup(x,y) {
 	return enemy;
 }
 
+// Strong Enemy
+// Slower, but takes many more shots
+function strongMookSetup(x,y) {
+	enemy = new Sprite (id["Strong Enemy.png"]);
+	// Starting Location
+	enemy.x = x;
+	enemy.y = y;
+	enemy.anchor.x = 0.5;
+	enemy.anchor.y = 0.5;
+	enemy.speed = 10;
+	enemy.life = 200 + addedLife*5;
+	
+	enemy.move = function() {
+		// Contain within the enemy walk path
+		var move = enemy.speed;		
+		createjs.Tween.get(enemy)
+			.to({x:740}, 20000)
+			.to({y:194}, 10000)
+			.to({x:54}, 20000)
+			.to({y:324}, 10000)
+			.to({x:900}, 20000);
+	}
+	gameScene.addChild(enemy);
+	return enemy;
+}
+// Fast Enemy
+// Faster, but fragile
+function fastMookSetup(x,y) {
+	enemy = new Sprite (id["Fast Enemy.png"]); 
+	// Starting Location
+	enemy.x = x;
+	enemy.y = y;
+	enemy.anchor.x = 0.5;
+	enemy.anchor.y = 0.5;
+	enemy.speed = 10;
+	enemy.life = 40 + addedLife/2;
+	
+	enemy.move = function() {
+		// Contain within the enemy walk path
+		var move = enemy.speed;		
+		createjs.Tween.get(enemy)
+			.to({x:740}, 5000)
+			.to({y:194}, 2500)
+			.to({x:54}, 5000)
+			.to({y:324}, 2500)
+			.to({x:900}, 5000);
+	}
+	gameScene.addChild(enemy);
+	return enemy;
+}
+
 function checkForDefeat() {
 	for(var i = 0, j = enemies.length; i < j; i++) {
 		if(enemies[i].life <= 0) {
-			//console.log("Defeat!");
+			console.log(defeated);
 			addedLife += 2; // Slowly increase maximum life
-			//removeTweens(enemies[i]);
+			
 			money += 5;
 			defeated += 1;
+			createjs.Tween.removeTweens(enemies[i]);
 			gameScene.removeChild(enemies[i]);
 			enemies.splice(i,1);
 			i--;	// Decrement
@@ -1142,8 +1198,43 @@ function checkForDefeat() {
 }
 
 function addEnemy() {
-	var enemy;						// Easy to add different types of enemies
-	enemy = enemySetup(-100, 60);		
+	var enemy, randomNumber;
+	if (defeated == 20){
+		randomNumber = randomInt(1,100);
+		if(randomNumber < 85 ){
+			// Generic Mook
+			enemy = genericMookSetup(-100, 60);
+		}
+		else{
+			// Strong Mook
+			enemy = strongMookSetup(-100, 60);
+		}
+	}
+	else if (defeated == 60){
+		randomNumber = randomInt(1,100);
+		if(randomNumber < 50 ){
+			// Generic Mook
+			enemy = genericMookSetup(-100, 60);
+		}
+		else if(randomNumber < 80){
+			// Strong Mook
+			enemy = strongMookSetup(-100, 60);
+		}
+		else{
+			// Fast Mook
+			enemy = fastMookSetup(-100, 60);
+		}
+	}
+	else{
+		enemy = genericMookSetup(-100, 60);
+	}		
 	enemies.push(enemy);
 }
 
+/*******************************************************************************************************
+Random Integer Function 
+*******************************************************************************************************/
+// Random generates a number from [0,1). Min and max reachable.
+function randomInt(min, max){
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
