@@ -52,6 +52,7 @@ var defeated = 0;
 var addEnemyTimer = 100;
 var selectedTower;
 
+var enemyPass = new PIXI.Rectangle(800,302,100,40);
 
 // Text Variables
 			var waveNumberText = new Text('wave test');
@@ -380,22 +381,23 @@ function game() {
 	else{
 		towerInformationText.text = (' ');
 	}
-	
-	/*
-	NOTE TO SELF:
-	Try to add:
-		1. Waves
-		2. More Enemies
-		3. Pause the Enemy attack rate during waves.
-	*/
-	
+		
 	if(addEnemyTimer < 1){
 		addEnemy();
 		addEnemyTimer = 100;
 		
 	}
+	// (800,302)-(800,400) 
 	for(var i = 0, j = enemies.length; i < j; i++){
 		enemies[i].move();
+		if(enemyPass.contains(enemies[i].x - enemies[i].width ,enemies[i].y) == true){
+			console.log("Enemy Pass");
+			createjs.Tween.removeTweens(enemies[i]);
+			gameScene.removeChild(enemies[i]);
+			enemies.splice(i,1);
+			i--;
+			j--;
+		}
 	}
 	for(var i = 0, j = towers.length; i < j; i++){
 		towers[i].findTarget();
@@ -412,6 +414,7 @@ function game() {
 			i--;
 		}
 	}
+
 	
 }
 
@@ -535,8 +538,8 @@ function longTowerSetup(x,y){
 	var longTower = new Sprite(id["Long Tower.png"]);
 	longTower.anchor.x = 0.5;
 	longTower.anchor.y = 0.5;
-	longTower.scale = 0.7;
-	longTower.scale = 0.7;
+	longTower.scale.x = 0.7;
+	longTower.scale.y = 0.7;
 	longTower.x = x;
 	longTower.y = y;
 	longTower.attackRate = 125;	
@@ -1170,11 +1173,11 @@ function fastMookSetup(x,y) {
 		// Contain within the enemy walk path
 		var move = enemy.speed;		
 		createjs.Tween.get(enemy)
-			.to({x:740}, 5000)
-			.to({y:194}, 2500)
-			.to({x:54}, 5000)
-			.to({y:324}, 2500)
-			.to({x:900}, 5000);
+			.to({x:740}, 4000)
+			.to({y:194}, 2000)
+			.to({x:54}, 4000)
+			.to({y:324}, 2000)
+			.to({x:900}, 4000);
 	}
 	gameScene.addChild(enemy);
 	return enemy;
@@ -1199,7 +1202,7 @@ function checkForDefeat() {
 
 function addEnemy() {
 	var enemy, randomNumber;
-	if (defeated == 20){
+	if (60 > defeated && defeated > 20){
 		randomNumber = randomInt(1,100);
 		if(randomNumber < 85 ){
 			// Generic Mook
@@ -1210,7 +1213,7 @@ function addEnemy() {
 			enemy = strongMookSetup(-100, 60);
 		}
 	}
-	else if (defeated == 60){
+	else if (defeated > 60){
 		randomNumber = randomInt(1,100);
 		if(randomNumber < 50 ){
 			// Generic Mook
@@ -1236,5 +1239,7 @@ Random Integer Function
 *******************************************************************************************************/
 // Random generates a number from [0,1). Min and max reachable.
 function randomInt(min, max){
+	
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
