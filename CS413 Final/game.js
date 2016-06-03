@@ -44,12 +44,14 @@ Global Variables
 **********************************************************************************************************/
 var towers = [];
 var bullets = [];
-var money = 100; // Testing Purposes
+var money = 1000; // Testing Purposes
 var mousePosition = renderer.plugins.interaction.mouse.global;
 var enemies = [];
 var addedLife = 0; // Used to increment difficulty
 var defeated = 0;
 var addEnemyTimer = 100;
+
+
 
 
 
@@ -110,6 +112,12 @@ function setup() {
 	/*******************************************************************************************************
 	Introduction Scene 
 	*******************************************************************************************************/
+	setTimeout(function(){
+		playBut.interactive = true;
+		instructBut.interactive = true;
+		creditsBut.interactive = true;
+		}, 2000);
+	
 	// Menu + Buttons
 	introMenu = new Sprite (id["Introduction Screen.png"]);
 	playBut = new Sprite(id["New Game Button.png"]);
@@ -134,7 +142,7 @@ function setup() {
 		playBut.position.y = 0;
 		createjs.Tween.get(playBut.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);	
 		//playSound.play();
-		playBut.interactive = true;
+		playBut.interactive = false;
 		playBut.on('mousedown', gameHandler)	
 		
 		// Instruction Button
@@ -145,7 +153,7 @@ function setup() {
 		instructBut.position.y = 120;
 		createjs.Tween.get(instructBut.position).wait(500).to({x: 50, y: 120}, 1000, createjs.Ease.bounceOut);
 		//	setTimeout(function(){instructSound.play();}, 750);
-		instructBut.interactive = true;
+		instructBut.interactive = false;
 		instructBut.on('mousedown',instructHandler);	
 		
 		// Credits button
@@ -156,7 +164,7 @@ function setup() {
 		creditsBut.position.y = 240;
 		createjs.Tween.get(creditsBut.position).wait(1000).to({x: 100, y: 240}, 1000, createjs.Ease.bounceOut);
 		//	setTimeout(function(){creditsTweenSound.play();}, 1250);
-		creditsBut.interactive = true;
+		creditsBut.interactive = false;
 		creditsBut.on('mousedown', creditHandler);
 	
 	
@@ -197,15 +205,38 @@ function setup() {
 	/*******************************************************************************************************
 	Game Scene 
 	*******************************************************************************************************/
-	// Screen 
-	gameScreen = new Sprite(id["Game Screen.png"]);
+	// Game Screen Composition
+	// Made of several picture, grass, road, and interface.
+	var gameScreen = new Container();
 	gameScene.addChild(gameScreen);
-	gameScreen.interactive = true;
-	//  gameScreen.on('mousedown', placeTower)
-	//gameScreen.on('mousemove', getMousePos);
+	
+	// Elements of the Game Screen
+	grass = new Sprite(id["Grass.png"]);
+	road = new Sprite(id["Road.png"]);
+	gameInterface = new Sprite(id["Interface.png"]);	// Holds the Buttons, Tower Information, and Game Information
+	
+	// Grass is Positioned at the top level
+	gameScreen.addChild(grass);
+	grass.position.x = 0;
+	grass.position.y = 0;
+	
+	// Road Positioned slightly down. Fits in road slot
+	// in grass.png
+	gameScreen.addChild(road);
+	road.position.x = 0;
+	road.position.y = 40;
+	road.interactive = false;
+	
+	// Interface is positioned at the bottom of the screen below the grass
+	gameScreen.addChild(gameInterface);
+	gameInterface.position.x = 0;
+	gameInterface.position.y = 446;
+	gameInterface.interactive = false;
 	
 		// Tower Button Sprites
 		arrowTowerBut = new Sprite(id["Arrow Tower Button.png"]);
+		quickTowerBut = new Sprite(id["Quick Tower Button.png"]);
+		longTowerBut = new Sprite(id["Long Tower Button.png"]);
 	
 		// Tower's Button Container
 			/*
@@ -216,8 +247,8 @@ function setup() {
 			
 		var towerButtons = new Container();
 		towerButtons.position.x = 0;
-		towerButtons.position.y = 555;
-		gameScene.addChild(towerButtons);
+		towerButtons.position.y = 110;
+		gameInterface.addChild(towerButtons);
 		
 			// Arrow Tower Button
 			towerButtons.addChild(arrowTowerBut);
@@ -227,8 +258,24 @@ function setup() {
 			arrowTowerBut.position.y = 0;
 			arrowTowerBut.interactive = true;
 			arrowTowerBut.on('mousedown', arrowTowerButtonHandler);
-			// More Towers to be added
-		
+			
+			// Quick Tower Button
+			towerButtons.addChild(quickTowerBut);
+			quickTowerBut.anchor.x = 0.5;
+			quickTowerBut.anchor.y = 0.5;
+			quickTowerBut.position.x = 150;
+			quickTowerBut.position.y = 0;
+			quickTowerBut.interactive = true;
+			quickTowerBut.on('mousedown', quickTowerButtonHandler);
+			
+			// Long Tower Button
+			towerButtons.addChild(longTowerBut);
+			longTowerBut.anchor.x = 0.5;
+			longTowerBut.anchor.y = 0.5;
+			longTowerBut.position.x = 250;
+			longTowerBut.position.y = 0;
+			longTowerBut.interactive = true;
+			longTowerBut.on('mousedown', longTowerButtonHandler);
 		
 		
 		// Information Container
@@ -240,9 +287,9 @@ function setup() {
 			*/
 			
 		var userInterfaceInfo = new Container();
-		userInterfaceInfo.position.x = 700;
+		userInterfaceInfo.position.x = 100;
 		userInterfaceInfo.y = 555;
-		gameScene.addChild(userInterfaceInfo);
+		gameInterface.addChild(userInterfaceInfo);
 			
 		// Tower Information Container
 			/*
@@ -256,9 +303,9 @@ function setup() {
 			*/
 			
 		var towerInformation = new Container();
-		towerInformation.position.x = 500;
+		towerInformation.position.x = 100;
 		towerInformation.position.y = 555;
-		gameScene.addChild(towerInformation);
+		gameInterface.addChild(towerInformation);
 	
 	
 	/*******************************************************************************************************
@@ -291,10 +338,19 @@ function introduction() {}
 function game() {
 	checkForDefeat();
 	addEnemyTimer--;
+	
+	/*
+	NOTE TO SELF:
+	Try to add:
+		1. Waves
+		2. More Enemies
+		3. Pause the Enemy attack rate during waves.
+	*/
+	
 	if(addEnemyTimer < 1){
 		addEnemy();
 		addEnemyTimer = 100;
-		console.log(addedLife);
+		
 	}
 	for(var i = 0, j = enemies.length; i < j; i++){
 		enemies[i].move();
@@ -305,10 +361,10 @@ function game() {
 		towers[i].fire();
 	}
 	for(var i = 0, j = bullets.length; i < j; i++){
-		bullets[i].tween();
+		bullets[i].move();
 		if(bullets[i].checkForHit()){
 			createjs.Tween.removeTweens(bullets[i]);
-			gameScreen.removeChild(bullets[i]);
+			gameScene.removeChild(bullets[i]);
 			bullets.splice(i,1);
 			j--;
 			i--;
@@ -316,6 +372,18 @@ function game() {
 	}
 	
 }
+
+/*
+	NOTE TO SELF:
+		1. Add setTimeout on buttons when tweening so user's don't click on them early
+		
+		ex:
+		setTimeout(function(){
+			playBut.interactive = true;
+			instructBut.interactive = true;
+			creditsBut.interactive = true;
+		}, 2000);
+*/
 
 /**********************************************************************************************************
 Menu Handlers
@@ -341,7 +409,6 @@ Menu Handlers
 		introScene.position.y = -800;
 		
 		createjs.Tween.get(instructScene.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);
-	
 	}
 	
 	/*******************************************************************************************************
@@ -380,22 +447,40 @@ Game Handlers
 **********************************************************************************************************/
 function arrowTowerButtonHandler(){
 	if (money < 50){
-		gameScene.interactive = false;
-		console.log("Arrow Tower Handler: False")
+		grass.interactive = false;
+		//console.log("Arrow Tower Handler: False")
 		selectedTower = null;
 		return null;
 	}
 	money -= 50;
-	gameScene.interactive = true;
-	// Subtract money when placed.
-	console.log("Total Money is: ");
-	console.log(money);
-	console.log("Arrow Tower Handler: True");
-	// Draw circle on mouse
-	// Allow player to place a tower
-	changeTower();
+	grass.interactive = true;
+	selectedTower = "Arrow Tower";
+	changeTower(selectedTower);
 }
 
+function quickTowerButtonHandler(){
+	if (money < 75){
+		grass.interactive = false;
+		selectedTower = null;
+		return null;
+	}
+	money -= 75;
+	grass.interactive = true;
+	selectedTower = "Quick Tower";
+	changeTower(selectedTower);
+}
+
+function longTowerButtonHandler(){
+	if (money < 125){
+		grass.interactive = false;
+		selectedTower = null;
+		return null;
+	}
+	money -= 125;
+	grass.interactive = true;
+	selectedTower = "Long Tower";
+	changeTower(selectedTower);
+}
 /**********************************************************************************************************
 Helper Functions
 **********************************************************************************************************/
@@ -404,6 +489,144 @@ Helper Functions
 Tower Stuff
 *******************************************************************************************************/
 
+function longTowerSetup(x,y){
+	var longTower = new Sprite(id["Long Tower.png"]);
+	longTower.anchor.x = 0.5;
+	longTower.anchor.y = 0.5;
+	longTower.x = x;
+	longTower.y = y;
+	longTower.attackRate = 125;	
+	longTower.damage = 75;
+	longTower.cost = 125;
+	longTower.range = 200;
+	longTower.target = null;
+	grass.addChild(longTower);
+	
+	
+	
+// Lets the arrow tower find a target
+longTower.findTarget = function() {
+	// If there are no enemies, then there is no target
+	if(enemies.length === 0) {
+		longTower.target = null;
+		return;
+	}
+	
+	// If the target is defeated, then remove target
+	if(longTower.target && longTower.target.life <= 0) {
+		longTower.target = null;
+	}
+	
+	// Find the first enemy within the range and target
+	for(var i = 0, j = enemies.length; i < j; i++){
+		// 60 is added to look at the center of the square.
+		var dist = (enemies[i].x-longTower.x)*(enemies[i].x-longTower.x+60)+
+			(enemies[i].y-longTower.y)*(enemies[i].y-longTower.y+60);
+		if(dist < (longTower.range * longTower.range)) {
+			longTower.target = enemies[i];
+			return;
+		}
+	}
+}
+
+// Lets the Arrow Tower Fire
+longTower.fire = function() {
+	longTower.attackRate--;
+	if(longTower.target && longTower.attackRate <= 0) {
+		bullets.push(bulletSetup(longTower.x, longTower.y, longTower.target, longTower.damage));
+		longTower.attackRate = 125;
+		//console.log("FIRE!")
+		// Reset attack rate
+	}
+}
+
+	
+// Need to find Vector for bullets
+longTower.findVector = function() {
+	// If there is no target, then return false
+	if (this.target == null)
+		return false;
+	var xDistance = longTower.target.x - longTower.x;
+	var yDistance = longTower.target.y - longTower.y;
+	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
+	longTower.xFire = longTower.x + 60 * xDistance / dist;
+	longTower.yFire = longTower.y + 60 * yDistance / dist;
+}
+return longTower;
+}
+
+function quickTowerSetup(x,y){
+	var quickTower = new Sprite(id["Quick Tower.png"]);
+	quickTower.anchor.x = 0.5;
+	quickTower.anchor.y = 0.5;
+	quickTower.x = x;
+	quickTower.y = y;
+	quickTower.attackRate = 50;	
+	quickTower.damage = 75;
+	quickTower.cost = 75;
+	quickTower.range = 100;
+	quickTower.target = null;
+	grass.addChild(quickTower);
+	
+	/*
+	console.log("Arrow Tower Properites: ");
+	console.log(quickTower);
+	console.log(quickTower.x);
+	console.log(quickTower.y);
+	console.log(quickTower.findTarget);
+	*/
+	
+// Lets the arrow tower find a target
+quickTower.findTarget = function() {
+	// If there are no enemies, then there is no target
+	if(enemies.length === 0) {
+		quickTower.target = null;
+		return;
+	}
+	
+	// If the target is defeated, then remove target
+	if(quickTower.target && quickTower.target.life <= 0) {
+		quickTower.target = null;
+	}
+	
+	// Find the first enemy within the range and target
+	for(var i = 0, j = enemies.length; i < j; i++){
+		// 60 is added to look at the center of the square.
+		var dist = (enemies[i].x-quickTower.x)*(enemies[i].x-quickTower.x+60)+
+			(enemies[i].y-quickTower.y)*(enemies[i].y-quickTower.y+60);
+		if(dist < (quickTower.range * quickTower.range)) {
+			quickTower.target = enemies[i];
+			return;
+		}
+	}
+}
+
+// Lets the Arrow Tower Fire
+quickTower.fire = function() {
+	quickTower.attackRate--;
+	if(quickTower.target && quickTower.attackRate <= 0) {
+		bullets.push(bulletSetup(quickTower.x, quickTower.y, quickTower.target, quickTower.damage));
+		quickTower.attackRate = 50;
+		//console.log("FIRE!")
+		// Reset attack rate
+	}
+}
+
+	
+// Need to find Vector for bullets
+quickTower.findVector = function() {
+	// If there is no target, then return false
+	if (this.target == null)
+		return false;
+	var xDistance = quickTower.target.x - quickTower.x;
+	var yDistance = quickTower.target.y - quickTower.y;
+	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
+	quickTower.xFire = quickTower.x + 60 * xDistance / dist;
+	quickTower.yFire = quickTower.y + 60 * yDistance / dist;
+}
+
+return quickTower;
+}
 
 function arrowTowerSetup(x,y){
 	var arrowTower = new Sprite(id["Arrow Tower.png"]);
@@ -412,18 +635,19 @@ function arrowTowerSetup(x,y){
 	arrowTower.x = x;
 	arrowTower.y = y;
 	arrowTower.attackRate = 100;	
-	arrowTower.damage = 1000;
+	arrowTower.damage = 100;
 	arrowTower.cost = 50;
 	arrowTower.range = 150;
 	arrowTower.target = null;
-	gameScreen.addChild(arrowTower);
+	grass.addChild(arrowTower);
 	
+	/*
 	console.log("Arrow Tower Properites: ");
 	console.log(arrowTower);
 	console.log(arrowTower.x);
 	console.log(arrowTower.y);
 	console.log(arrowTower.findTarget);
-
+	*/
 	
 // Lets the arrow tower find a target
 arrowTower.findTarget = function() {
@@ -434,7 +658,7 @@ arrowTower.findTarget = function() {
 	}
 	
 	// If the target is defeated, then remove target
-	if(arrowTower.target && arrowTower.target.ife <= 0) {
+	if(arrowTower.target && arrowTower.target.life <= 0) {
 		arrowTower.target = null;
 	}
 	
@@ -456,7 +680,7 @@ arrowTower.fire = function() {
 	if(arrowTower.target && arrowTower.attackRate <= 0) {
 		bullets.push(bulletSetup(arrowTower.x, arrowTower.y, arrowTower.target, arrowTower.damage));
 		arrowTower.attackRate = 100;
-		console.log("FIRE!")
+		//console.log("FIRE!")
 		// Reset attack rate
 	}
 }
@@ -473,7 +697,6 @@ arrowTower.findVector = function() {
 	arrowTower.xFire = arrowTower.x + 60 * xDistance / dist;
 	arrowTower.yFire = arrowTower.y + 60 * yDistance / dist;
 }
-
 return arrowTower;
 }
 
@@ -483,11 +706,8 @@ Tower Placing
 // Change Tower Type
 function changeTower(n) {
 	currentTower = n;
-	console.log("Mouse Position");
-	console.log(mousePosition);
-	console.log("Change Tower");
-	gameScreen.interactive = true;
-	gameScreen.on('mousedown', placeTower);
+	grass.interactive = true;
+	grass.on('mousedown', placeTower);
 }
 
 // add a tower
@@ -508,29 +728,274 @@ function changeTower(n) {
 
 */
 function placeTower() {
-	var topPath = {x:0, y:0, width:760, height: 40};
-	var topToMiddle = {x:720, y:80, width:40, height:91};
-	var middlePath = {x:36, y:171, width:724, height:40};
-	var midToBot = {x:36, y: 211, width:40, height:91};
-	var bottomPath = {x:36, y:302, width:764, height:40};
+	if(selectedTower == "Arrow Tower"){
+		var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
+		
+		if (towerAllowed(mousePosition.x, mousePosition.y, NewArrowTower) == true){
+			// console.log("Created.");
+			towers.push(NewArrowTower);
+		}
+		else{
+			grass.removeChild(NewArrowTower);
+		}
+	}
 	
+	else if(selectedTower == "Quick Tower"){
+		var NewQuickTower = quickTowerSetup(mousePosition.x,mousePosition.y);
+		
+		if (towerAllowed(mousePosition.x, mousePosition.y, NewArrowTower) == true){
+			// console.log("Created.");
+			towers.push(NewArrowTower);
+		}
+		else{
+			grass.removeChild(NewArrowTower);
+		}
+	}
 	
-	var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
-	towers.push(NewArrowTower);
+	else if(selectedTower == "Long Tower"){
+		if (towerAllowed(mousePosition.x, mousePosition.y)== true){
+			var NewLongTower = longTowerSetup(mousePosition.x,mousePosition.y);
+			towers.push(NewLongTower);
+		}
+	}
 	
-	console.log("Placed the turret down.");
-	console.log("Towers: ");
-	console.log(towers);
-	addEnemy();
-	gameScreen.interactive = false;
+	else {
+		console.log("Whoops. Tower Error.")
+	}
+	
+	selectedTower == "Null";
+	grass.interactive = false;
 
 }
 
-function towerAllowed(x,y){
+/*
+Grass Contain: Check
+(0,0)-(800,40) 1 
+(760,40)-(40,262) 2
+(0,80)-(720,91) 3 
+(0,171)-(36,275) 4
+(76,211)-(684,91) 5
+(36,342)-(764,104) 6
+
+(0,0) - (800,446) - Game
+*/
+
+
+
+function towerAllowed(x,y, tower){
+	var checkGame = new PIXI.Rectangle(0,0,800,446);
+	var checkOne = new PIXI.Rectangle(0,0,800,40);
+	var checkTwo = new PIXI.Rectangle(760,40,40,262);
+	var checkThree = new PIXI.Rectangle(0,80,720,91);
+	var checkFour = new PIXI.Rectangle(0,171,36,275);
+	var checkFive = new PIXI.Rectangle(76,211,684,91);
+	var checkSix = new PIXI.Rectangle(36,342,764,104);
 	
-	// Contain in map and not in the path 
-	// Make sure it isn't to close to any other towers	
+
+	
+	// Checks Mouse Click, not entire tower, so I'm checking tower edges
+	// Could be more specific, but I want to have the tower's dimensions be 
+	// flexible so I can change it later if I want.
+	if(checkGame.contains(x,y) == true){
+		console.log("checkGame");
+				
+		// Left
+		if(checkGame.contains((x - tower.width) ,y) == false){
+			console.log("Left");
+			return false;
+		}
+		// Right
+		if(checkGame.contains(x + tower.width, y) == false){
+			console.log("RIght");
+			return false;
+		}
+		// Top
+		if(checkGame.contains(x, y + tower.height) == false) {
+			console.log("Top");
+			return false;
+		}
+		// Bottom
+		if(checkGame.contains(x, y - tower.height) == false){
+			console.log("Bot");
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				console.log("Tower");
+				return false;
+			}
+		}
+		
+	}
+	if (checkOne.contains(x,y) == true){
+		console.log("checkOne");
+		// Left
+		if(checkOne.contains(x + tower.width ,y) == false){
+			return false;
+		}
+		// Right
+		if(checkOne.contains(x, y + tower.height) == false){
+			return false;
+		}
+		// Top
+		if(checkOne.contains(x + tower.width, y + tower.height) == false) {
+			return false;
+		}
+		// Bottom
+		if(checkOne.contains(x - tower.width, y - tower.height) == false){
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	if (checkTwo.contains(x,y) == true){
+		console.log("checkTwo");
+		// Left
+		if(checkTwo.contains(x + tower.width ,y) == false){
+			return false;
+		}
+		// Right
+		if(checkTwo.contains(x, y + tower.height) == false){
+			return false;
+		}
+		// Top
+		if(checkTwo.contains(x + tower.width, y + tower.height) == false) {
+			return false;
+		}
+		// Bottom
+		if(checkTwo.contains(x - tower.width, y - tower.height) == false){
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	if (checkThree.contains(x,y) == true){
+		console.log("checkThree");
+		// Left
+		if(checkThree.contains(x + tower.width ,y) == false){
+			return false;
+		}
+		// Right
+		if(checkThree.contains(x, y + tower.height) == false){
+			return false;
+		}
+		// Top
+		if(checkThree.contains(x + tower.width, y + tower.height) == false) {
+			return false;
+		}
+		// Bottom
+		if(checkThree.contains(x - tower.width, y - tower.height) == false){
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	if (checkFour.contains(x,y) == true){
+		console.log("checkFour");
+		// Left
+		if(checkFour.contains(x + tower.width ,y) == false){
+			return false;
+		}
+		// Right
+		if(checkFour.contains(x, y + tower.height) == false){
+			return false;
+		}
+		// Top
+		if(checkFour.contains(x + tower.width, y + tower.height) == false) {
+			return false;
+		}
+		// Bottom
+		if(checkFour.contains(x - tower.width, y - tower.height) == false){
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	if (checkFive.contains(x,y) == true){
+		console.log("checkFive");
+		// Left
+		if(checkFive.contains(x + tower.width ,y) == false){
+			return false;
+		}
+		// Right
+		if(checkFive.contains(x, y + tower.height) == false){
+			return false;
+		}
+		// Top
+		if(checkFive.contains(x + tower.width, y + tower.height) == false) {
+			return false;
+		}
+		// Bottom
+		if(checkFive.contains(x - tower.width, y - tower.height) == false){
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	if (checkSix.contains(x,y) == true){
+		console.log("checkSix");
+		// Left
+		if(checkSix.contains(x + tower.width ,y) == false){
+			return false;
+		}
+		// Right
+		if(checkSix.contains(x, y + tower.height) == false){
+			return false;
+		}
+		// Top
+		if(checkSix.contains(x + tower.width, y + tower.height) == false) {
+			return false;
+		}
+		// Bottom
+		if(checkSix.contains(x - tower.width, y - tower.height) == false){
+			return false;
+		}
+		
+		for(var i = 0, j = towers.length; i<j; i++){
+			if(Math.abs(x-towers[i].x) < towers[i].width && Math.abs(towers[i].y-y) < towers[i].height){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	// Default
+	return false;
 }
+
+
+
 
 function drawMouse(){
 	// If the mouse isn't on the game screen 
@@ -545,54 +1010,45 @@ function drawMouse(){
 /*******************************************************************************************************
 Bullets
 *******************************************************************************************************/
-// Need to create a bullet that goes to the intended target
+// Create a bullet that goes to the intended target
 // and deal damage.
 function bulletSetup(x,y,target,damage) {
 	var bullet = new Sprite(id["Bullet Sprite.png"]);
+	// Starting Location
 	bullet.x = x;
 	bullet.y = y;
 	bullet.anchor.x = 0.5;
 	bullet.anchor.y = 0.5;
+	bullet.scale.x = 0.5;
+	bullet.scale.y = 0.5;
+	// Damage to deal and to whom
 	bullet.target = target;
 	bullet.damage = damage;
+	// General speed of bullet along with empty values to be filled in
+	bullet.speed = 3;
 	bullet.xDistance = 0;
 	bullet.yDistance = 0;
 	bullet.dist = null;
+	// Push the bullet to the bullets array + add it to the gameScene
 	bullets.push(bullet);
-	gameScreen.addChild(bullet);
-	// bullet.tween();
-	
+	gameScene.addChild(bullet);
 	
 	// Intended effect is that the bullet goes for the center of the enemy,
 	// not the corners or edges.
 	bullet.move = function() {
 		bullet.xDistance = bullet.target.x + bullet.width/2 - bullet.x;
 		bullet.yDistance = bullet.target.y + bullet.height/2 - bullet.y;
-		// var dist = Math.sqrt(xDistance*xDistance + yDistance*yDistance);
-		// bullet.x = bullet.x + bullet.speed*xDistance/dist;
-		// bullet.y = bullet.y + bullet.speed*yDistance/dist;
+		bullet.dist = Math.sqrt(bullet.xDistance * bullet.xDistance + bullet.yDistance * bullet.yDistance);
+		bullet.x = bullet.x + bullet.speed * bullet.xDistance / bullet.dist;
+		bullet.y = bullet.y + bullet.speed * bullet.yDistance / bullet.dist
 	}
-	
-	// Tween to the target?
-	bullet.tween = function() {
-		bullet.move();	
-		//console.log("xDistance: ");
-		//console.log(bullet.xDistance);
-		//console.log("yDistance: ");
-		//console.log(bullet.yDistance);
-		createjs.Tween.get(bullet.position)
-			.to({x:bullet.xDistance, y:bullet.yDistance}, 1000); 
-		
-	}
-	
+	// Check for a collision with the target
 	bullet.checkForHit = function() {
 		if(bullet.x < bullet.target.x + bullet.target.width && bullet.y < bullet.target.y + bullet.target.height){
 			bullet.target.life -= bullet.damage;
 			return true;
 		}
 	}
-	// Check for collision to do damage or just have a quick timer?
-	
 	return bullet;
 }
 
@@ -601,44 +1057,38 @@ Attackers
 *******************************************************************************************************/
 function enemySetup(x,y) {
 	enemy = new Sprite (id["Generic Enemy.png"]);
+	// Starting Location
 	enemy.x = x;
 	enemy.y = y;
-	enemy.vx = 0;
-	enemy.vy = 0;
 	enemy.anchor.x = 0.5;
 	enemy.anchor.y = 0.5;
 	enemy.speed = 10;
 	enemy.life = 40 + addedLife;
 	
+	
 	enemy.move = function() {
 		// Contain within the enemy walk path
-		var move = enemy.speed;
-		// (-100,60) - (740,60)
-		// (740,60) - (740,194)
-		// (740,194) - (54, 194)
-		// (54,194) - (54, 324)
-		// (54,324) - (900,324) - Go a bit beyond 
-		
+		var move = enemy.speed;		
 		createjs.Tween.get(enemy)
-			.to({x:740}, 5000)
+			.to({x:740}, 10000)
 			.to({y:194}, 5000)
-			.to({x:54}, 5000)
+			.to({x:54}, 10000)
 			.to({y:324}, 5000)
-			.to({x:900}, 5000);
+			.to({x:900}, 10000);
 	}
-	gameScreen.addChild(enemy);
+	gameScene.addChild(enemy);
 	return enemy;
 }
 
 function checkForDefeat() {
 	for(var i = 0, j = enemies.length; i < j; i++) {
 		if(enemies[i].life <= 0) {
-			console.log("Defeat!");
+			//console.log("Defeat!");
 			addedLife += 2; // Slowly increase maximum life
 			//removeTweens(enemies[i]);
 			// Increase money income
 			defeated += 1;
-			gameScreen.removeChild(enemies[i]);
+			gameScene.removeChild(enemies[i]);
 			enemies.splice(i,1);
 			i--;	// Decrement
 			j--;	// Decrement
@@ -648,39 +1098,7 @@ function checkForDefeat() {
 
 function addEnemy() {
 	var enemy;						// Easy to add different types of enemies
-	enemy = enemySetup(-100, 60);		// Change when I figure out spawning location
-	console.log("Created an Enemy.");
+	enemy = enemySetup(-100, 60);		
 	enemies.push(enemy);
 }
 
-function contain(sprite, container) {
-	
-	// Undef until collision, displays the collision location when a collision occurs
-	var collision = undefined;
-	
-	// Left Side
-	if (sprite.x < container.y){
-		sprite.x = container.x;
-		collision = 'left';
-	}
-	
-	// Top Side
-	if (sprite.y < container.y){
-		sprite.y = container.y;
-		collision = 'top';
-	}
-	
-	// Right Side
-	if (sprite.x + sprite.width > container.width){
-		sprite.x = container.width - sprite.width;
-		collision = 'right';
-	}
-	
-	// Bottom Side
-	if (sprite.y + sprite.height > container.height){
-		sprite.y = container.height - sprite.height;
-		collision = 'bottom';
-	}
-	
-	return collision
-}
