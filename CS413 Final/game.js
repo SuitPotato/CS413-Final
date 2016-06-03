@@ -53,6 +53,7 @@ var addEnemyTimer = 100;
 var selectedTower;
 var lives = 10;
 
+
 var enemyPass = new PIXI.Rectangle(800,302,100,40);
 
 // Text Variables
@@ -178,7 +179,7 @@ function setup() {
 	/*******************************************************************************************************
 	Instructions Scene 
 	*******************************************************************************************************/
-	instructScreen = new Sprite(id["How to Play Screen.png"]);
+	instructScreen = new Sprite(id["How to Play.png"]);
 	instructScene.addChild(instructScreen);
 	
 		// Back Button
@@ -186,12 +187,10 @@ function setup() {
 		instructScene.addChild(instructBack);
 		instructBack.anchor.x = 0.5;
 		instructBack.anchor.y = 0.5;
-		instructBack.position.x = 250;		
+		instructBack.position.x = 650;		
 		instructBack.position.y = 500;		
 		instructBack.interactive = true;
 		instructBack.on('mousedown', generalBackHandler);
-		
-		// Will probably need a next button to transit different instruction images
 	
 	/*******************************************************************************************************
 	Credits Scene 
@@ -305,7 +304,7 @@ function setup() {
 		var userInterfaceInfo = new Container();
 		gameInterface.addChild(userInterfaceInfo);
 		userInterfaceInfo.position.x = 655;
-		userInterfaceInfo.position.y = 0;
+		userInterfaceInfo.position.y = 20;
 				
 			// Wave Number Text
 			userInterfaceInfo.addChild(defeatedText);
@@ -315,12 +314,12 @@ function setup() {
 			// Money Text
 			userInterfaceInfo.addChild(moneyText);
 			moneyText.position.x = 0;
-			moneyText.position.y = 20;
+			moneyText.position.y = 40;
 			
 			// Lives Text
 			userInterfaceInfo.addChild(livesText);
 			livesText.position.x = 0;
-			livesText.position.y = 40;
+			livesText.position.y = 80;
 			
 			
 			
@@ -340,13 +339,15 @@ function setup() {
 		
 			towerInformation.addChild(towerInformationText);
 			towerInformationText.position.x = 0;
-			towerInformationText.position.y = 0;
+			towerInformationText.position.y = 20;
 		
 	
 	
 	/*******************************************************************************************************
 	Game Over Scene 
 	*******************************************************************************************************/
+	var loseScreen = new Sprite(id["Lose Screen.png"]);
+	gameOverScene.addChild(loseScreen);
 	
 	/*******************************************************************************************************
 	Render Setup!
@@ -383,16 +384,16 @@ function game() {
 		towerInformationText.text = (' ');
 	}
 	else if(selectedTower == "Arrow Tower"){
-		towerInformationText.text = ('Arrow Tower \n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+		towerInformationText.text = ('Arrow Tower \n' + 'Damage: 50 \n' + 'Attack Rate: x1\n' + 'Range: 100 \n');
 	}
 	else if(selectedTower == "Quick Tower"){
-		towerInformationText.text = ('Quick Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+		towerInformationText.text = ('Quick Tower\n' + 'Damage: 75\n' + 'Attack Rate: x2\n' + 'Range: 80 \n');
 	}
 	else if(selectedTower == "Long Tower"){
-		towerInformationText.text = ('Long Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+		towerInformationText.text = ('Long Tower\n' + 'Damage: 75 \n' + 'Attack Rate: x3/4 \n' + 'Range: 200 \n');
 	}
 	else if(selectedTower == "Small Tower"){
-		towerInformationText.text = ('Long Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+		towerInformationText.text = ('Small Tower\n' + 'Damage: 50\n' + 'Attack Rate: x3/4 \n' + 'Range: 100\n');
 	}
 	else{
 		towerInformationText.text = (' ');
@@ -440,17 +441,11 @@ function game() {
 	
 }
 
-/*
-	NOTE TO SELF:
-		1. Add setTimeout on buttons when tweening so user's don't click on them early
-		
-		ex:
-		setTimeout(function(){
-			playBut.interactive = true;
-			instructBut.interactive = true;
-			creditsBut.interactive = true;
-		}, 2000);
-*/
+function loss(){
+	gameScene.visible = false;
+	loseScene.visible = true;
+}
+
 
 /**********************************************************************************************************
 Menu Handlers
@@ -502,12 +497,7 @@ Menu Handlers
 		
 		createjs.Tween.get(introScene.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);
 	}
-	/*
-	function getMousePos(mouseData){
-		console.log("X = "+mouseData.data.originalEvent.movementX);  
-		console.log("Y = "+mouseData.data.originalEvent.movementY);
-	}*/
-	
+
 /**********************************************************************************************************
 Game Handlers
 **********************************************************************************************************/
@@ -644,7 +634,7 @@ function quickTowerSetup(x,y){
 	quickTower.attackRate = 50;	
 	quickTower.damage = 75;
 	quickTower.cost = 125;
-	quickTower.range = 100;
+	quickTower.range = 80;
 	quickTower.target = null;
 	grass.addChild(quickTower);
 	
@@ -717,20 +707,13 @@ function arrowTowerSetup(x,y){
 	arrowTower.x = x;
 	arrowTower.y = y;
 	arrowTower.attackRate = 100;	
-	arrowTower.damage = 100;
+	arrowTower.damage = 50;
 	arrowTower.cost = 50;
-	arrowTower.range = 150;
+	arrowTower.range = 100;
 	arrowTower.target = null;
 	grass.addChild(arrowTower);
 	
-	/*
-	console.log("Arrow Tower Properites: ");
-	console.log(arrowTower);
-	console.log(arrowTower.x);
-	console.log(arrowTower.y);
-	console.log(arrowTower.findTarget);
-	*/
-	
+
 // Lets the arrow tower find a target
 arrowTower.findTarget = function() {
 	// If there are no enemies, then there is no target
@@ -1242,11 +1225,11 @@ function strongMookSetup(x,y) {
 		// Contain within the enemy walk path
 		var move = enemy.speed;		
 		createjs.Tween.get(enemy)
-			.to({x:740}, 20000)
+			.to({x:740}, 10000)
 			.to({y:194}, 10000)
-			.to({x:54}, 20000)
+			.to({x:54}, 10000)
 			.to({y:324}, 10000)
-			.to({x:900}, 20000);
+			.to({x:900}, 10000);
 	}
 	gameScene.addChild(enemy);
 	return enemy;
