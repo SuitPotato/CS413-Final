@@ -37,32 +37,49 @@ Loader
 **********************************************************************************************************/	
 loader
 	.add("images/assets.json")
+	.add("audio/Arrow Tower.mp3")
+	.add("audio/Back.mp3")
+	.add("audio/Defeat.mp3")
+	.add("audio/Life Lost.mp3")
+	.add("audio/Long Shot.mp3")
+	.add("audio/Quick Tower.mp3")
+	.add("audio/Select.mp3")
+	.add("audio/Small Tower.mp3")
 	.load(setup);
 	
 /**********************************************************************************************************
 Global Variables
 **********************************************************************************************************/
-var towers = [];
-var bullets = [];
-var money = 1000; // Testing Purposes
-var mousePosition = renderer.plugins.interaction.mouse.global;
-var enemies = [];
+var towers = [];	// all towers
+var bullets = [];	// all bullets
+var money = 300; 	// Money Variable, and starter money
+var mousePosition = renderer.plugins.interaction.mouse.global;		// Current Mouse Position
+var enemies = [];	// Total enemies
 var addedLife = 0; // Used to increment difficulty
-var defeated = 0;
-var addEnemyTimer = 100;
-var selectedTower;
-var lives = 10;
+var defeated = 0;	// Counter for defeated enemies
+var addEnemyTimer = 100;	// Timer for enemies
+var selectedTower;	// Selected Tower
+var lives = 10;		// Life Count
 
-
+// Rectangle to check if enemies pass
 var enemyPass = new PIXI.Rectangle(800,302,100,40);
 
 // Text Variables
-			var defeatedText = new Text('Defeated: ' + defeated, {font : '24px Impact'});
-			var moneyText = new Text('Gold: ' + money, {font : '24px Impact'});
-			var livesText = new Text('Lives: '+ lives, {font : '24px Impact'} );
-			var towerInformationText = new Text(' ', {font : '24px Impact'});
+var defeatedText = new Text('Defeated: ' + defeated, {font : '24px Impact'});
+var moneyText = new Text('Gold: ' + money, {font : '24px Impact'});
+var livesText = new Text('Lives: '+ lives, {font : '24px Impact'} );
+var towerInformationText = new Text(' ', {font : '24px Impact'});
 			
-		
+// Music Variables
+var arrowTowerSound,
+	backSound,
+	defeatSound,
+	lifeLostSound,
+	longTowerSound,
+	quickTowerSound,
+	selectSound,
+	smallTowerSound;
+
 /**********************************************************************************************************
 Setup Function
 **********************************************************************************************************/
@@ -79,6 +96,21 @@ function setup() {
 	
 	// ASSIGN MUSIC STUFF HERE
 	
+	arrowTowerSound = PIXI.audioManager.getAudio("audio/Arrow Tower.mp3");
+	backSound = PIXI.audioManager.getAudio("audio/Back.mp3");
+	defeatSound = PIXI.audioManager.getAudio("audio/Defeat.mp3");
+	lifeLostSound = PIXI.audioManager.getAudio("audio/Life Lost.mp3");
+	longTowerSound = PIXI.audioManager.getAudio("audio/Long Shot.mp3");
+	quickTowerSound = PIXI.audioManager.getAudio("audio/Quick Tower.mp3");
+	selectSound = PIXI.audioManager.getAudio("audio/Select.mp3");
+	smallTowerSound = PIXI.audioManager.getAudio("audio/Small Tower.mp3");
+	
+	arrowTowerSound.volume = 0.3;
+	defeatSound.volume = 0.4;
+	lifeLostSound.volume = 0.6;
+	longTowerSound.volume = 0.3;
+	quickTowerSound.volume = 0.3;
+	smallTowerSound.volume = 0.3;
 	/*******************************************************************************************************
 	Scene Creations
 	*******************************************************************************************************/
@@ -149,7 +181,6 @@ function setup() {
 		playBut.position.x = -550;
 		playBut.position.y = 0;
 		createjs.Tween.get(playBut.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);	
-		//playSound.play();
 		playBut.interactive = false;
 		playBut.on('mousedown', gameHandler)	
 		
@@ -160,7 +191,6 @@ function setup() {
 		instructBut.position.x = -550;
 		instructBut.position.y = 120;
 		createjs.Tween.get(instructBut.position).wait(500).to({x: 50, y: 120}, 1000, createjs.Ease.bounceOut);
-		//	setTimeout(function(){instructSound.play();}, 750);
 		instructBut.interactive = false;
 		instructBut.on('mousedown',instructHandler);	
 		
@@ -171,7 +201,6 @@ function setup() {
 		creditsBut.position.x = -550;
 		creditsBut.position.y = 240;
 		createjs.Tween.get(creditsBut.position).wait(1000).to({x: 100, y: 240}, 1000, createjs.Ease.bounceOut);
-		//	setTimeout(function(){creditsTweenSound.play();}, 1250);
 		creditsBut.interactive = false;
 		creditsBut.on('mousedown', creditHandler);
 	
@@ -435,6 +464,7 @@ function game() {
 	
 	if(lives == 0)
 	{
+		lifeLostSound.play();
 		state = loss;
 	}
 
@@ -443,7 +473,7 @@ function game() {
 
 function loss(){
 	gameScene.visible = false;
-	loseScene.visible = true;
+	gameOverScene.visible = true;
 }
 
 
@@ -458,7 +488,7 @@ Menu Handlers
 		introScene.visible = false;
 		state = game;
 		gameScene.visible = true;
-		// selectSound.play();
+		selectSound.play();
 	}
 	
 	/*******************************************************************************************************
@@ -467,7 +497,7 @@ Menu Handlers
 	function instructHandler(e){
 		introScene.visible = false;
 		instructScene.visible = true;
-		// selectSound.play();
+		selectSound.play();
 		introScene.position.y = -800;
 		createjs.Tween.get(instructScene.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);
 	}
@@ -478,7 +508,7 @@ Menu Handlers
 	function creditHandler(e){
 		introScene.visible = false;
 		creditScene.visible = true;
-		// selectSound.play();
+		selectSound.play();
 		introScene.position.y = -800;
 		createjs.Tween.get(creditScene.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);
 	}
@@ -491,7 +521,7 @@ Menu Handlers
 		introScene.visible = true;
 		instructScene.visible = false;
 		creditScene.visible = false;
-		// backSound.play();
+		backSound.play();
 		instructScene.position.x = 800;
 		creditScene.position.x = -800;
 		
@@ -511,6 +541,7 @@ function arrowTowerButtonHandler(){
 	grass.interactive = true;
 	selectedTower = "Arrow Tower";
 	changeTower(selectedTower);
+	selectSound.play();
 }
 
 function quickTowerButtonHandler(){
@@ -523,6 +554,7 @@ function quickTowerButtonHandler(){
 	grass.interactive = true;
 	selectedTower = "Quick Tower";
 	changeTower(selectedTower);
+	selectSound.play();
 }
 
 function longTowerButtonHandler(){
@@ -535,6 +567,7 @@ function longTowerButtonHandler(){
 	grass.interactive = true;
 	selectedTower = "Long Tower";
 	changeTower(selectedTower);
+	selectSound.play();
 }
 
 function smallTowerButtonHandler(){
@@ -546,6 +579,7 @@ function smallTowerButtonHandler(){
 	grass.interactive = true;
 	selectedTower = "Small Tower";
 	changeTower(selectedTower);
+	selectSound.play();
 }
 /**********************************************************************************************************
 Helper Functions
@@ -603,8 +637,7 @@ longTower.fire = function() {
 	if(longTower.target && longTower.attackRate <= 0) {
 		bullets.push(bulletSetup(longTower.x, longTower.y, longTower.target, longTower.damage));
 		longTower.attackRate = 125;
-		//console.log("FIRE!")
-		// Reset attack rate
+		longTowerSound.play();
 	}
 }
 
@@ -677,8 +710,7 @@ quickTower.fire = function() {
 	if(quickTower.target && quickTower.attackRate <= 0) {
 		bullets.push(bulletSetup(quickTower.x, quickTower.y, quickTower.target, quickTower.damage));
 		quickTower.attackRate = 50;
-		//console.log("FIRE!")
-		// Reset attack rate
+		quickTowerSound.play();
 	}
 }
 
@@ -745,8 +777,7 @@ arrowTower.fire = function() {
 	if(arrowTower.target && arrowTower.attackRate <= 0) {
 		bullets.push(bulletSetup(arrowTower.x, arrowTower.y, arrowTower.target, arrowTower.damage));
 		arrowTower.attackRate = 100;
-		//console.log("FIRE!")
-		// Reset attack rate
+		arrowTowerSound.play();
 	}
 }
 
@@ -810,6 +841,7 @@ smallTower.fire = function() {
 	if(smallTower.target && smallTower.attackRate <= 0) {
 		bullets.push(bulletSetup(smallTower.x, smallTower.y, smallTower.target, smallTower.damage));
 		smallTower.attackRate = 100;
+		smallTowerSound.play();
 	}
 }
 
@@ -1193,7 +1225,8 @@ function genericMookSetup(x,y) {
 	enemy.anchor.x = 0.5;
 	enemy.anchor.y = 0.5;
 	enemy.speed = 10;
-	enemy.life = 40 + addedLife;
+	enemy.life = 100 + addedLife;
+
 	
 	enemy.move = function() {
 		// Contain within the enemy walk path
@@ -1219,7 +1252,7 @@ function strongMookSetup(x,y) {
 	enemy.anchor.x = 0.5;
 	enemy.anchor.y = 0.5;
 	enemy.speed = 10;
-	enemy.life = 200 + addedLife*5;
+	enemy.life = 400 + addedLife*10;
 	
 	enemy.move = function() {
 		// Contain within the enemy walk path
@@ -1244,7 +1277,7 @@ function fastMookSetup(x,y) {
 	enemy.anchor.x = 0.5;
 	enemy.anchor.y = 0.5;
 	enemy.speed = 10;
-	enemy.life = 40 + addedLife/2;
+	enemy.life = 40 + addedLife*2;
 	
 	enemy.move = function() {
 		// Contain within the enemy walk path
@@ -1265,7 +1298,7 @@ function checkForDefeat() {
 		if(enemies[i].life <= 0) {
 			console.log(defeated);
 			addedLife += 2; // Slowly increase maximum life
-			
+			defeatSound.play();
 			money += 10;
 			defeated += 1;
 			createjs.Tween.removeTweens(enemies[i]);
