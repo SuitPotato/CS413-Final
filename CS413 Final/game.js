@@ -563,9 +563,9 @@ longTower.findTarget = function() {
 	
 	// Find the first enemy within the range and target
 	for(var i = 0, j = enemies.length; i < j; i++){
-		// 60 is added to look at the center of the square.
-		var dist = (enemies[i].x-longTower.x)*(enemies[i].x-longTower.x+60)+
-			(enemies[i].y-longTower.y)*(enemies[i].y-longTower.y+60);
+	
+		var dist = (enemies[i].x-longTower.x)*(enemies[i].x-longTower.x)+
+			(enemies[i].y-longTower.y)*(enemies[i].y-longTower.y);
 		if(dist < (longTower.range * longTower.range)) {
 			longTower.target = enemies[i];
 			return;
@@ -593,8 +593,8 @@ longTower.findVector = function() {
 	var xDistance = longTower.target.x - longTower.x;
 	var yDistance = longTower.target.y - longTower.y;
 	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
-	longTower.xFire = longTower.x + 60 * xDistance / dist;
-	longTower.yFire = longTower.y + 60 * yDistance / dist;
+	longTower.xFire = longTower.x  * xDistance / dist;
+	longTower.yFire = longTower.y  * yDistance / dist;
 }
 return longTower;
 }
@@ -637,9 +637,9 @@ quickTower.findTarget = function() {
 	
 	// Find the first enemy within the range and target
 	for(var i = 0, j = enemies.length; i < j; i++){
-		// 60 is added to look at the center of the square.
-		var dist = (enemies[i].x-quickTower.x)*(enemies[i].x-quickTower.x+60)+
-			(enemies[i].y-quickTower.y)*(enemies[i].y-quickTower.y+60);
+		
+		var dist = (enemies[i].x-quickTower.x)*(enemies[i].x-quickTower.x)+
+			(enemies[i].y-quickTower.y)*(enemies[i].y-quickTower.y);
 		if(dist < (quickTower.range * quickTower.range)) {
 			quickTower.target = enemies[i];
 			return;
@@ -667,8 +667,8 @@ quickTower.findVector = function() {
 	var xDistance = quickTower.target.x - quickTower.x;
 	var yDistance = quickTower.target.y - quickTower.y;
 	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
-	quickTower.xFire = quickTower.x + 60 * xDistance / dist;
-	quickTower.yFire = quickTower.y + 60 * yDistance / dist;
+	quickTower.xFire = quickTower.x  * xDistance / dist;
+	quickTower.yFire = quickTower.y  * yDistance / dist;
 }
 
 return quickTower;
@@ -712,9 +712,9 @@ arrowTower.findTarget = function() {
 	
 	// Find the first enemy within the range and target
 	for(var i = 0, j = enemies.length; i < j; i++){
-		// 60 is added to look at the center of the square.
-		var dist = (enemies[i].x-arrowTower.x)*(enemies[i].x-arrowTower.x+60)+
-			(enemies[i].y-arrowTower.y)*(enemies[i].y-arrowTower.y+60);
+		
+		var dist = (enemies[i].x-arrowTower.x)*(enemies[i].x-arrowTower.x)+
+			(enemies[i].y-arrowTower.y)*(enemies[i].y-arrowTower.y);
 		if(dist < (arrowTower.range * arrowTower.range)) {
 			arrowTower.target = enemies[i];
 			return;
@@ -742,8 +742,8 @@ arrowTower.findVector = function() {
 	var xDistance = arrowTower.target.x - arrowTower.x;
 	var yDistance = arrowTower.target.y - arrowTower.y;
 	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
-	arrowTower.xFire = arrowTower.x + 60 * xDistance / dist;
-	arrowTower.yFire = arrowTower.y + 60 * yDistance / dist;
+	arrowTower.xFire = arrowTower.x * xDistance / dist;
+	arrowTower.yFire = arrowTower.y * yDistance / dist;
 }
 return arrowTower;
 }
