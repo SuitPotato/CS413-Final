@@ -6,7 +6,7 @@
         <key>texturePackerVersion</key>
         <string>4.2.1</string>
         <key>fileName</key>
-        <string>C:/Users/Keith/Documents/GitHub/CS413-Final/CS413 Final/Images/Assets.tps</string>
+        <string>C:/Users/Keith/Documents/GitHub/CS413-Final/CS413 Final/images/Assets.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -70,7 +70,7 @@
             </struct>
         </struct>
         <key>shapePadding</key>
-        <uint>0</uint>
+        <uint>1</uint>
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
@@ -86,9 +86,9 @@
         <key>maxTextureSize</key>
         <QSize>
             <key>width</key>
-            <int>2048</int>
+            <int>8192</int>
             <key>height</key>
-            <int>2048</int>
+            <int>8192</int>
         </QSize>
         <key>fixedTextureSize</key>
         <QSize>
@@ -196,11 +196,27 @@
             <key type="filename">Buttons/How to Play Button.png</key>
             <key type="filename">Buttons/New Game Button Highlight.png</key>
             <key type="filename">Buttons/New Game Button.png</key>
+            <key type="filename">Buttons/Next Button.png</key>
             <key type="filename">Screens/Credits Screen.png</key>
-            <key type="filename">Screens/Game Screen.png</key>
-            <key type="filename">Screens/Instructions Screen.png</key>
+            <key type="filename">Screens/Game Screen Composition/Grass.png</key>
+            <key type="filename">Screens/Game Screen Composition/Interface.png</key>
+            <key type="filename">Screens/Game Screen Composition/Road.png</key>
+            <key type="filename">Screens/Instructions/How to Play.png</key>
             <key type="filename">Screens/Introduction Screen.png</key>
+            <key type="filename">Screens/Lose Screen.png</key>
             <key type="filename">Sprites/Arrow Tower Button.png</key>
+            <key type="filename">Sprites/Arrow Tower.png</key>
+            <key type="filename">Sprites/Bullet Sprite.png</key>
+            <key type="filename">Sprites/Fast Enemy.png</key>
+            <key type="filename">Sprites/Generic Enemy.png</key>
+            <key type="filename">Sprites/Gold Coin.png</key>
+            <key type="filename">Sprites/Long Tower Button.png</key>
+            <key type="filename">Sprites/Long Tower.png</key>
+            <key type="filename">Sprites/Quick Tower Button.png</key>
+            <key type="filename">Sprites/Quick Tower.png</key>
+            <key type="filename">Sprites/Small Tower Button.png</key>
+            <key type="filename">Sprites/Small Tower.png</key>
+            <key type="filename">Sprites/Strong Enemy.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -217,10 +233,26 @@
             <filename>Buttons/Credits Button Highlight.png</filename>
             <filename>Buttons/Credits Button.png</filename>
             <filename>Screens/Credits Screen.png</filename>
-            <filename>Screens/Instructions Screen.png</filename>
             <filename>Screens/Introduction Screen.png</filename>
-            <filename>Screens/Game Screen.png</filename>
             <filename>Sprites/Arrow Tower Button.png</filename>
+            <filename>Sprites/Arrow Tower.png</filename>
+            <filename>Sprites/Generic Enemy.png</filename>
+            <filename>Sprites/Bullet Sprite.png</filename>
+            <filename>Sprites/Long Tower Button.png</filename>
+            <filename>Sprites/Quick Tower Button.png</filename>
+            <filename>Sprites/Quick Tower.png</filename>
+            <filename>Sprites/Gold Coin.png</filename>
+            <filename>Sprites/Long Tower.png</filename>
+            <filename>Screens/Game Screen Composition/Interface.png</filename>
+            <filename>Screens/Game Screen Composition/Road.png</filename>
+            <filename>Screens/Game Screen Composition/Grass.png</filename>
+            <filename>Sprites/Fast Enemy.png</filename>
+            <filename>Sprites/Strong Enemy.png</filename>
+            <filename>Sprites/Small Tower Button.png</filename>
+            <filename>Sprites/Small Tower.png</filename>
+            <filename>Buttons/Next Button.png</filename>
+            <filename>Screens/Instructions/How to Play.png</filename>
+            <filename>Screens/Lose Screen.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
