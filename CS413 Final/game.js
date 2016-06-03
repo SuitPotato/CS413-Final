@@ -244,6 +244,7 @@ function setup() {
 		arrowTowerBut = new Sprite(id["Arrow Tower Button.png"]);
 		quickTowerBut = new Sprite(id["Quick Tower Button.png"]);
 		longTowerBut = new Sprite(id["Long Tower Button.png"]);
+		smallTowerBut = new Sprite(id["Small Tower Button.png"]);
 	
 		// Tower's Button Container
 			/*
@@ -283,7 +284,15 @@ function setup() {
 			longTowerBut.position.y = 0;
 			longTowerBut.interactive = true;
 			longTowerBut.on('mousedown', longTowerButtonHandler);
-		
+			
+			// Small Tower Button
+			towerButtons.addChild(smallTowerBut);
+			smallTowerBut.anchor.x = 0.5;
+			smallTowerBut.anchor.y = 0.5;
+			smallTowerBut.position.x = 350;
+			smallTowerBut.position.y = 0;
+			smallTowerBut.interactive = true;
+			smallTowerBut.on('mousedown', smallTowerButtonHandler);
 		
 		// Information Container
 			/*
@@ -382,6 +391,9 @@ function game() {
 	else if(selectedTower == "Long Tower"){
 		towerInformationText.text = ('Long Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
 	}
+	else if(selectedTower == "Small Tower"){
+		towerInformationText.text = ('Long Tower\n' + 'Damage: \n' + 'Attack Rate: \n' + 'Range \n');
+	}
 	else{
 		towerInformationText.text = (' ');
 	}
@@ -462,7 +474,6 @@ Menu Handlers
 		instructScene.visible = true;
 		// selectSound.play();
 		introScene.position.y = -800;
-		
 		createjs.Tween.get(instructScene.position).to({x: 0, y: 0}, 1000, createjs.Ease.bounceOut);
 	}
 	
@@ -533,6 +544,17 @@ function longTowerButtonHandler(){
 	
 	grass.interactive = true;
 	selectedTower = "Long Tower";
+	changeTower(selectedTower);
+}
+
+function smallTowerButtonHandler(){
+	if(money < 75){
+		grass.interactive = false;
+		selectedTower = null;
+		return null;
+	}
+	grass.interactive = true;
+	selectedTower = "Small Tower";
 	changeTower(selectedTower);
 }
 /**********************************************************************************************************
@@ -760,6 +782,68 @@ arrowTower.findVector = function() {
 return arrowTower;
 }
 
+function smallTowerSetup(x,y){
+	var smallTower = new Sprite(id["Arrow Tower.png"]);
+	smallTower.anchor.x = 0.5;
+	smallTower.anchor.y = 0.5;
+	smallTower.scale.x = 0.7;
+	smallTower.scale.y = 0.7;
+	smallTower.x = x;
+	smallTower.y = y;
+	smallTower.attackRate = 100;	
+	smallTower.damage = 50;
+	smallTower.cost = 75;
+	smallTower.range = 100;
+	smallTower.target = null;
+	grass.addChild(smallTower);
+	
+
+smallTower.findTarget = function() {
+	// If there are no enemies, then there is no target
+	if(enemies.length === 0) {
+		smallTower.target = null;
+		return;
+	}
+	
+	// If the target is defeated, then remove target
+	if(smallTower.target && smallTower.target.life <= 0) {
+		smallTower.target = null;
+	}
+	
+	// Find the first enemy within the range and target
+	for(var i = 0, j = enemies.length; i < j; i++){
+		
+		var dist = (enemies[i].x-smallTower.x)*(enemies[i].x-smallTower.x)+
+			(enemies[i].y-smallTower.y)*(enemies[i].y-smallTower.y);
+		if(dist < (smallTower.range * smallTower.range)) {
+			smallTower.target = enemies[i];
+			return;
+		}
+	}
+}
+
+smallTower.fire = function() {
+	smallTower.attackRate--;
+	if(smallTower.target && smallTower.attackRate <= 0) {
+		bullets.push(bulletSetup(smallTower.x, smallTower.y, smallTower.target, smallTower.damage));
+		smallTower.attackRate = 100;
+	}
+}
+
+	
+// Need to find Vector for bullets
+smallTower.findVector = function() {
+	// If there is no target, then return false
+	if (this.target == null)
+		return false;
+	var xDistance = smallTower.target.x - smallTower.x;
+	var yDistance = smallTower.target.y - smallTower.y;
+	var dist = Math.sqrt(xDistance * xDistance + yDistance*yDistance);	// a^2 + b^2 = c^2, solved for c
+	smallTower.xFire = smallTower.x * xDistance / dist;
+	smallTower.yFire = smallTower.y * yDistance / dist;
+}
+return smallTower;
+}
 /*******************************************************************************************************
 Tower Placing
 *******************************************************************************************************/
@@ -769,8 +853,6 @@ function changeTower(n) {
 	grass.interactive = true;
 	grass.on('mousedown', placeTower);
 }
-
-
 function placeTower() {
 	
 	if(selectedTower == "Arrow Tower"){
@@ -806,6 +888,18 @@ function placeTower() {
 		}
 		else{
 			grass.removeChild(NewLongTower);
+		}
+	}
+	if(selectedTower == "Small Tower"){
+		var NewSmallTower = smallTowerSetup(mousePosition.x,mousePosition.y);
+		
+		if (towerAllowed(mousePosition.x, mousePosition.y, NewSmallTower) == true){
+			// console.log("Created.");
+			money -= NewSmallTower.cost;
+			towers.push(NewSmallTower);
+		}
+		else{
+			grass.removeChild(NewSmallTower);
 		}
 	}
 	selectedTower = null;
@@ -1057,18 +1151,6 @@ function towerAllowed(x,y, tower){
 	return false;
 }
 
-
-
-
-function drawMouse(){
-	// If the mouse isn't on the game screen 
-	if(!mouse)
-		return;
-	var graphics = new PIXI.Graphics();
-	var range = towerClasses[currentTower].range;
-	// if tower is allowed, transparent yellow
-	// else tower is not allowed, transparent red
-}
 
 /*******************************************************************************************************
 Bullets
