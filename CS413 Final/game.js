@@ -51,14 +51,15 @@ var addedLife = 0; // Used to increment difficulty
 var defeated = 0;
 var addEnemyTimer = 100;
 var selectedTower;
+var lives = 10;
 
 var enemyPass = new PIXI.Rectangle(800,302,100,40);
 
 // Text Variables
-			var waveNumberText = new Text('wave test');
-			var moneyText = new Text(money);
-			var livesText = new Text('lives');
-			var towerInformationText = new Text('Tower Test');
+			var defeatedText = new Text('Defeated: ' + defeated, {font : '24px Impact'});
+			var moneyText = new Text('Gold: ' + money, {font : '24px Impact'});
+			var livesText = new Text('Lives: '+ lives, {font : '24px Impact'} );
+			var towerInformationText = new Text(' ', {font : '24px Impact'});
 			
 		
 /**********************************************************************************************************
@@ -298,9 +299,9 @@ function setup() {
 		userInterfaceInfo.position.y = 0;
 				
 			// Wave Number Text
-			userInterfaceInfo.addChild(waveNumberText);
-			waveNumberText.position.x = 0;
-			waveNumberText.position.y = 0;
+			userInterfaceInfo.addChild(defeatedText);
+			defeatedText.position.x = 0;
+			defeatedText.position.y = 0;
 			
 			// Money Text
 			userInterfaceInfo.addChild(moneyText);
@@ -364,7 +365,10 @@ function introduction() {}
 function game() {
 	checkForDefeat();
 	addEnemyTimer--;
-	moneyText.text = money;
+	moneyText.text = 'Gold: ' + money;
+	livesText.text = 'Lives: ' + lives;
+	
+		
 	
 	if(selectedTower == null){
 		towerInformationText.text = (' ');
@@ -395,6 +399,7 @@ function game() {
 			createjs.Tween.removeTweens(enemies[i]);
 			gameScene.removeChild(enemies[i]);
 			enemies.splice(i,1);
+			lives--;
 			i--;
 			j--;
 		}
@@ -413,6 +418,11 @@ function game() {
 			j--;
 			i--;
 		}
+	}
+	
+	if(lives == 0)
+	{
+		state = loss;
 	}
 
 	
@@ -496,7 +506,6 @@ function arrowTowerButtonHandler(){
 		selectedTower = null;
 		return null;
 	}
-	money -= 50;
 	
 	grass.interactive = true;
 	selectedTower = "Arrow Tower";
@@ -509,7 +518,7 @@ function quickTowerButtonHandler(){
 		selectedTower = null;
 		return null;
 	}
-	money -= 75;
+	
 	grass.interactive = true;
 	selectedTower = "Quick Tower";
 	changeTower(selectedTower);
@@ -521,7 +530,7 @@ function longTowerButtonHandler(){
 		selectedTower = null;
 		return null;
 	}
-	money -= 125;
+	
 	grass.interactive = true;
 	selectedTower = "Long Tower";
 	changeTower(selectedTower);
@@ -768,6 +777,7 @@ function placeTower() {
 		var NewArrowTower = arrowTowerSetup(mousePosition.x,mousePosition.y);
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewArrowTower) == true){
 			// console.log("Created.");
+			money -= NewArrowTower.cost;
 			towers.push(NewArrowTower);
 		}
 		else{
@@ -779,6 +789,7 @@ function placeTower() {
 		
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewQuickTower) == true){
 			// console.log("Created.");
+			money -= NewQuickTower.cost;
 			towers.push(NewQuickTower);
 		}
 		else{
@@ -790,6 +801,7 @@ function placeTower() {
 		
 		if (towerAllowed(mousePosition.x, mousePosition.y, NewLongTower) == true){
 			// console.log("Created.");
+			money -= NewLongTower.cost;
 			towers.push(NewLongTower);
 		}
 		else{
@@ -1189,7 +1201,7 @@ function checkForDefeat() {
 			console.log(defeated);
 			addedLife += 2; // Slowly increase maximum life
 			
-			money += 5;
+			money += 10;
 			defeated += 1;
 			createjs.Tween.removeTweens(enemies[i]);
 			gameScene.removeChild(enemies[i]);
