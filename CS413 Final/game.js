@@ -575,7 +575,7 @@ function longTowerSetup(x,y){
 	longTower.y = y;
 	longTower.attackRate = 125;	
 	longTower.damage = 75;
-	longTower.cost = 125;
+	longTower.cost = 150;
 	longTower.range = 200;
 	longTower.target = null;
 	grass.addChild(longTower);
@@ -643,7 +643,7 @@ function quickTowerSetup(x,y){
 	quickTower.y = y;
 	quickTower.attackRate = 50;	
 	quickTower.damage = 75;
-	quickTower.cost = 75;
+	quickTower.cost = 125;
 	quickTower.range = 100;
 	quickTower.target = null;
 	grass.addChild(quickTower);
@@ -783,7 +783,7 @@ return arrowTower;
 }
 
 function smallTowerSetup(x,y){
-	var smallTower = new Sprite(id["Arrow Tower.png"]);
+	var smallTower = new Sprite(id["Small Tower.png"]);
 	smallTower.anchor.x = 0.5;
 	smallTower.anchor.y = 0.5;
 	smallTower.scale.x = 0.7;
@@ -792,7 +792,7 @@ function smallTowerSetup(x,y){
 	smallTower.y = y;
 	smallTower.attackRate = 100;	
 	smallTower.damage = 50;
-	smallTower.cost = 75;
+	smallTower.cost = 100;
 	smallTower.range = 100;
 	smallTower.target = null;
 	grass.addChild(smallTower);
